@@ -30,9 +30,16 @@ public class GameHUD : MonoBehaviour
     GameObject noteRoot;
     Text noteTitle;
     Text noteBody;
+    GameObject journalRoot;
+    Text journalBody;
+    GameObject codeRoot;
+    Text codeTitle;
+    Text codeDigits;
     GameObject pauseRoot;
     GameObject deathRoot;
     GameObject winRoot;
+    Text winTitle;
+    Text winBody;
     GameObject introRoot;
     float toastTimer;
     float hintTimer = 22f;
@@ -129,7 +136,7 @@ public class GameHUD : MonoBehaviour
             return;
         toastText.text = message;
         toastText.color = new Color(0.95f, 0.93f, 0.88f, 1f);
-        toastTimer = 2.4f;
+        toastTimer = 3.4f;
     }
 
     public void ShowNote(string title, string body)
@@ -155,18 +162,58 @@ public class GameHUD : MonoBehaviour
 
     public void ShowDeath()
     {
-        HideNote();
+        HideOverlays();
         ShowPause(false);
         if (deathRoot != null)
             deathRoot.SetActive(true);
     }
 
-    public void ShowWin()
+    public void ShowWin(string title, string body)
     {
-        HideNote();
+        HideOverlays();
         ShowPause(false);
+        if (winTitle != null)
+            winTitle.text = title;
+        if (winBody != null)
+            winBody.text = body + "\n\n按 R 再值一次班";
         if (winRoot != null)
             winRoot.SetActive(true);
+    }
+
+    public void HideOverlays()
+    {
+        HideNote();
+        HideJournal();
+        HideCode();
+    }
+
+    public void ShowJournal(string body)
+    {
+        if (journalRoot == null)
+            return;
+        journalBody.text = body;
+        journalRoot.SetActive(true);
+    }
+
+    public void HideJournal()
+    {
+        if (journalRoot != null)
+            journalRoot.SetActive(false);
+    }
+
+    public void ShowCode(string title, string digits)
+    {
+        if (codeRoot == null)
+            return;
+        codeTitle.text = title;
+        codeDigits.text = digits.Length == 0 ? "____" : digits;
+        codeRoot.SetActive(true);
+    }
+
+    public void HideCode()
+    {
+        if (codeRoot != null)
+            codeRoot.SetActive(false);
     }
 
     void Build()
@@ -186,12 +233,15 @@ public class GameHUD : MonoBehaviour
         vignette = FullImage(canvasGo.transform, "Vignette", sprite, new Color(0.4f, 0f, 0f, 0f));
         vignette.raycastTarget = false;
 
-        objectiveText = Label(canvasGo.transform, "Objective", "目标", 28, TextAnchor.UpperLeft,
-            new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(48f, -36f), new Vector2(1100f, 48f),
+        objectiveText = Label(canvasGo.transform, "Objective", "目标", 24, TextAnchor.UpperLeft,
+            new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(48f, -28f), new Vector2(980f, 72f),
             new Color(0.93f, 0.9f, 0.82f));
-        keyText = Label(canvasGo.transform, "Keys", "钥匙  无", 24, TextAnchor.UpperLeft,
-            new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(48f, -84f), new Vector2(1100f, 40f),
+        objectiveText.horizontalOverflow = HorizontalWrapMode.Wrap;
+        objectiveText.verticalOverflow = VerticalWrapMode.Truncate;
+        keyText = Label(canvasGo.transform, "Keys", "钥匙  无", 22, TextAnchor.UpperLeft,
+            new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(48f, -104f), new Vector2(980f, 56f),
             new Color(0.95f, 0.78f, 0.4f));
+        keyText.horizontalOverflow = HorizontalWrapMode.Wrap;
 
         batteryLabel = Label(canvasGo.transform, "BatteryLabel", "手电筒", 22, TextAnchor.UpperRight,
             new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-48f, -36f), new Vector2(280f, 32f),
@@ -220,7 +270,7 @@ public class GameHUD : MonoBehaviour
         toastText = Label(canvasGo.transform, "Toast", "", 26, TextAnchor.MiddleCenter,
             new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 210f), new Vector2(1100f, 44f),
             new Color(0.95f, 0.93f, 0.88f, 0f));
-        hintText = Label(canvasGo.transform, "Hint", "WASD 移动    Shift 冲刺    鼠标 视角    E 交互    F 手电筒    Esc 暂停",
+        hintText = Label(canvasGo.transform, "Hint", "WASD 移动    Shift 冲刺    E 交互    F 手电筒    J 夜班记录    Esc 暂停",
             20, TextAnchor.LowerCenter, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 28f),
             new Vector2(1400f, 32f), new Color(0.8f, 0.8f, 0.8f, 0.75f));
 
@@ -236,13 +286,38 @@ public class GameHUD : MonoBehaviour
         noteBody.verticalOverflow = VerticalWrapMode.Overflow;
         noteRoot.SetActive(false);
 
+        journalRoot = Panel(canvasGo.transform, "Journal", sprite, new Color(0.05f, 0.06f, 0.07f, 0.94f),
+            new Vector2(760f, 760f));
+        Label(journalRoot.transform, "Title", "夜班记录", 36, TextAnchor.UpperCenter,
+            new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -24f), new Vector2(680f, 48f),
+            new Color(0.95f, 0.86f, 0.62f));
+        journalBody = Label(journalRoot.transform, "Body", "", 24, TextAnchor.UpperLeft,
+            new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -84f), new Vector2(680f, 640f),
+            new Color(0.9f, 0.9f, 0.86f));
+        journalBody.horizontalOverflow = HorizontalWrapMode.Wrap;
+        journalBody.verticalOverflow = VerticalWrapMode.Overflow;
+        journalRoot.SetActive(false);
+
+        codeRoot = Panel(canvasGo.transform, "Code", sprite, new Color(0.04f, 0.05f, 0.06f, 0.94f),
+            new Vector2(640f, 280f));
+        codeTitle = Label(codeRoot.transform, "Title", "门禁", 34, TextAnchor.UpperCenter,
+            new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -28f), new Vector2(560f, 48f),
+            new Color(0.8f, 0.95f, 0.85f));
+        codeDigits = Label(codeRoot.transform, "Digits", "____", 54, TextAnchor.MiddleCenter,
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 10f), new Vector2(520f, 80f),
+            new Color(0.95f, 0.92f, 0.8f));
+        Label(codeRoot.transform, "Hint", "数字键输入    回车确认    Esc 取消", 22, TextAnchor.LowerCenter,
+            new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 24f), new Vector2(560f, 36f),
+            new Color(0.75f, 0.78f, 0.8f));
+        codeRoot.SetActive(false);
+
         introRoot = new GameObject("Intro");
         introRoot.transform.SetParent(canvasGo.transform, false);
         Stretch(introRoot.AddComponent<RectTransform>());
         Label(introRoot.transform, "Title", "夜班医院", 72, TextAnchor.MiddleCenter,
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 40f), new Vector2(800f, 100f),
             new Color(0.93f, 0.9f, 0.82f));
-        Label(introRoot.transform, "Sub", "看着它", 32, TextAnchor.MiddleCenter,
+        Label(introRoot.transform, "Sub", "四个章，然后跑", 32, TextAnchor.MiddleCenter,
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -40f), new Vector2(600f, 48f),
             new Color(0.75f, 0.28f, 0.22f));
 
@@ -264,14 +339,15 @@ public class GameHUD : MonoBehaviour
         MakeButton(deathRoot.transform, "再试一次", new Vector2(0f, -80f), delegate { GameManager.Instance.Restart(); });
         deathRoot.SetActive(false);
 
-        winRoot = Panel(canvasGo.transform, "Win", sprite, new Color(0.02f, 0.05f, 0.04f, 0.84f), new Vector2(640f, 300f));
-        Label(winRoot.transform, "Title", "你逃出了医院", 46, TextAnchor.UpperCenter,
-            new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -40f), new Vector2(560f, 70f),
+        winRoot = Panel(canvasGo.transform, "Win", sprite, new Color(0.02f, 0.05f, 0.04f, 0.88f), new Vector2(820f, 420f));
+        winTitle = Label(winRoot.transform, "Title", "你逃出了医院", 42, TextAnchor.UpperCenter,
+            new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -36f), new Vector2(740f, 64f),
             new Color(0.75f, 0.9f, 0.8f));
-        Label(winRoot.transform, "Sub", "夜班结束了。它停在门口，没有跟出来。", 24, TextAnchor.MiddleCenter,
-            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 10f), new Vector2(560f, 60f),
+        winBody = Label(winRoot.transform, "Sub", "", 24, TextAnchor.UpperCenter,
+            new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -120f), new Vector2(720f, 180f),
             new Color(0.9f, 0.92f, 0.9f));
-        MakeButton(winRoot.transform, "再玩一次", new Vector2(0f, -80f), delegate { GameManager.Instance.Restart(); });
+        winBody.horizontalOverflow = HorizontalWrapMode.Wrap;
+        MakeButton(winRoot.transform, "再玩一次", new Vector2(0f, -150f), delegate { GameManager.Instance.Restart(); });
         winRoot.SetActive(false);
 
         if (Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)

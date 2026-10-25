@@ -11,6 +11,7 @@ public class BasicFirstPersonController : MonoBehaviour
     public float sprintSpeed = 6.8f;
     public float mouseSensitivity = 3.2f;
     public float eyeHeight = 1.64f;
+    public float regenMultiplier = 1f;
 
     CharacterController controller;
     Vector2 smoothedInput;
@@ -90,7 +91,7 @@ public class BasicFirstPersonController : MonoBehaviour
         {
             regenDelay -= Time.deltaTime;
             if (regenDelay <= 0f)
-                stamina = Mathf.MoveTowards(stamina, 1f, 0.4f * Time.deltaTime);
+                stamina = Mathf.MoveTowards(stamina, 1f, 0.4f * regenMultiplier * Time.deltaTime);
         }
 
         stamina = Mathf.Clamp01(stamina);

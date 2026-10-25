@@ -6,8 +6,10 @@ using UnityEngine;
 /// </summary>
 public class EscapeDoor : MonoBehaviour, IInteractable
 {
+    public string doorId = "gate";
     public string requiredKeyId = "exit";
     public string lockedHint = "紧急出口锁着，需要出口钥匙";
+    public string openedToast = "出口开了，快出去";
     public bool consumeKey = true;
     public Transform panel;
     public Collider[] blockers;
@@ -63,7 +65,7 @@ public class EscapeDoor : MonoBehaviour, IInteractable
         if (GameAudio.Instance != null)
             GameAudio.Instance.PlayDoor();
         if (GameManager.Instance != null)
-            GameManager.Instance.NotifyDoorOpened("gate");
+            GameManager.Instance.NotifyDoorOpened(doorId);
 
         Vector3 from = panel != null ? panel.localPosition : Vector3.zero;
         Vector3 to = from + Vector3.up * slideDistance;
@@ -79,7 +81,7 @@ public class EscapeDoor : MonoBehaviour, IInteractable
         isOpen = true;
         busy = false;
         if (GameHUD.Instance != null)
-            GameHUD.Instance.Toast("出口开了，快出去");
+            GameHUD.Instance.Toast(openedToast);
     }
 
     void SetBlockers(bool enabled)

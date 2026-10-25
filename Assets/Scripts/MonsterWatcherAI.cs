@@ -143,16 +143,21 @@ public class MonsterWatcherAI : MonoBehaviour
         }
     }
 
+    bool HeldAtLoadingGate()
+    {
+        return GameManager.Instance != null
+            && GameManager.Instance.gateOpen
+            && !GameManager.Instance.MonsterReleased
+            && player.position.z > 73.2f
+            && transform.position.z < 72.15f;
+    }
+
     Vector3 ChooseTarget()
     {
         if (player == null)
             return transform.position;
 
-        bool playerOutside = GameManager.Instance != null
-            && GameManager.Instance.gateOpen
-            && player.position.z > 73.2f
-            && transform.position.z < 72.15f;
-        if (playerOutside)
+        if (HeldAtLoadingGate())
             return new Vector3(0f, 0f, 70.2f);
 
         if (!hunting)
@@ -317,7 +322,8 @@ public class MonsterWatcherAI : MonoBehaviour
         verticalVelocity += Physics.gravity.y * dt;
         Vector3 motion = direction * speed;
         motion.y = verticalVelocity;
-        if (GameManager.Instance != null && GameManager.Instance.gateOpen && transform.position.z > 71.7f && player.position.z > 73f)
+        if (GameManager.Instance != null && GameManager.Instance.gateOpen && !GameManager.Instance.MonsterReleased
+            && transform.position.z > 71.7f && player.position.z > 73f)
             motion = Vector3.zero;
         controller.Move(motion * dt);
     }

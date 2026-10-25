@@ -57,6 +57,13 @@ public class DoorController : MonoBehaviour, IInteractable
                 inventory.ConsumeKey(requiredKeyId);
         }
 
+        ForceOpen();
+    }
+
+    public void ForceOpen()
+    {
+        if (isOpen || busy)
+            return;
         StartCoroutine(OpenRoutine());
     }
 
