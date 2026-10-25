@@ -32,11 +32,25 @@ To preview the level in the editor before playing, select the HospitalSceneBuild
 - Shift: sprint (uses stamina)
 - E: pick up keys, read notes, open doors
 - F or right mouse: toggle flashlight
-- Esc: pause
+- J: night checklist (the world does not pause)
+- Number keys and Enter: door codes
+- Esc: pause, or cancel a code
 - R: restart after winning or dying
 
 ## How to escape
-Find the storage key, the exam key, and the exit key in room 307. Locked doors consume the matching key. The figure in the ward freezes while it is visible and not behind a wall, and moves when you look away. It will not follow you past the emergency exit.
+The night is nine steps, aimed at a blind playthrough of about five to six hours if you read the notes and finish the side tasks. Skipping the side tasks is shorter. Nothing in the level makes you wait on a timer.
+
+1. East emergency wing: assemble the pharmacy code from four room notes, then stamp the terminal.
+2. West administration: the keypad code is split between the break room and the meeting room. The archive holds *Observation Zero*, which has the surgery valve order and the psychiatry code.
+3. Ward: storage key, exam key, then the call buttons in rooms 301, 305, and 306, then the nurse-station stamp.
+4. The key in room 307 opens the loading gate only.
+5. East of the loading bay: set the valves, then stamp surgery.
+6. West of the bay: enter the psychiatry code, then stamp.
+7. Return to the archive printer. Printing the evacuation slip releases the figure from the ward.
+8. Open the north fence with the slip.
+9. Run past the fence.
+
+Press J for the checklist. Side tasks (Lin Xia's notes, pharmacy inventory, unfinished surgery, morgue tags, handover pages, and the quiet room) change the ending. The figure freezes while it is on screen and not behind a wall. Until the slip is printed, it will not follow you through the loading gate.
 
 ## Project Structure
 - Assets/Scripts/: gameplay scripts and scene builder logic

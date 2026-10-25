@@ -30,6 +30,7 @@ public class MonsterWatcherAI : MonoBehaviour
     float moanTimer;
     int patrolIndex;
     int pathIndex;
+    int pathGoal = -1;
     List<int> path = new List<int>();
     static readonly RaycastHit[] Hits = new RaycastHit[32];
 
@@ -143,22 +144,47 @@ public class MonsterWatcherAI : MonoBehaviour
         }
     }
 
+    bool PulledBackToWard()
+    {
+        return GameManager.Instance != null
+            && GameManager.Instance.gateOpen
+            && !GameManager.Instance.MonsterReleased
+            && player.position.z > 73.2f;
+    }
+
+    bool PlayerBeyondFence()
+    {
+        return GameManager.Instance != null
+            && GameManager.Instance.outerOpen
+            && player.position.z > 84.4f;
+    }
+
+    bool InsideYard()
+    {
+        return transform.position.z > 83.8f
+            && transform.position.x > -6.4f
+            && transform.position.x < 6.4f;
+    }
+
     Vector3 ChooseTarget()
     {
         if (player == null)
             return transform.position;
 
-        bool playerOutside = GameManager.Instance != null
-            && GameManager.Instance.gateOpen
-            && player.position.z > 73.2f
-            && transform.position.z < 72.15f;
-        if (playerOutside)
-            return new Vector3(0f, 0f, 70.2f);
+        if (PulledBackToWard())
+            return PathTowardWorld(new Vector3(0f, 0f, 70.2f));
+
+        if (PlayerBeyondFence() && InsideYard())
+        {
+            if (transform.position.z > 84.6f && Mathf.Abs(transform.position.x) > 0.8f)
+                return new Vector3(0f, 0f, transform.position.z);
+            return new Vector3(0f, 0f, 80.5f);
+        }
 
         if (!hunting)
             return PatrolPoint();
 
-        if (HasLineOfSightToPlayer() && DistanceToPlayer < 20f)
+        if (!PlayerBeyondFence() && HasLineOfSightToPlayer() && DistanceToPlayer < 20f)
             return player.position;
 
         return NextPathPoint();
@@ -183,17 +209,25 @@ public class MonsterWatcherAI : MonoBehaviour
 
     Vector3 NextPathPoint()
     {
-        if (graph == null)
-            return player.position;
+        if (player == null)
+            return transform.position;
+        return PathTowardWorld(player.position);
+    }
 
+    Vector3 PathTowardWorld(Vector3 world)
+    {
+        if (graph == null)
+            return world;
+
+        int goal = graph.Nearest(world);
         replanTimer -= Time.deltaTime;
-        if (path.Count == 0 || replanTimer <= 0f)
+        if (path.Count == 0 || replanTimer <= 0f || pathGoal != goal)
         {
             int from = graph.Nearest(transform.position);
-            int to = graph.Nearest(player.position);
-            path = graph.PathToward(from, to);
+            path = graph.PathToward(from, goal);
             pathIndex = 0;
             replanTimer = 0.4f;
+            pathGoal = goal;
         }
 
         while (pathIndex < path.Count)
@@ -207,7 +241,9 @@ public class MonsterWatcherAI : MonoBehaviour
                 return point;
         }
 
-        return player.position;
+        if (path.Count > 0 && path[path.Count - 1] != goal)
+            return graph.NodePosition(path[path.Count - 1]);
+        return world;
     }
 
     bool IsObserved()
@@ -317,8 +353,6 @@ public class MonsterWatcherAI : MonoBehaviour
         verticalVelocity += Physics.gravity.y * dt;
         Vector3 motion = direction * speed;
         motion.y = verticalVelocity;
-        if (GameManager.Instance != null && GameManager.Instance.gateOpen && transform.position.z > 71.7f && player.position.z > 73f)
-            motion = Vector3.zero;
         controller.Move(motion * dt);
     }
 

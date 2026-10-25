@@ -8,6 +8,7 @@ public class FlashlightController : MonoBehaviour
     public Light spot;
     public float battery = 1f;
     public float drainPerSecond = 0.0115f;
+    public float drainMultiplier = 1f;
     public bool isOn = true;
 
     float flickerClock;
@@ -33,7 +34,7 @@ public class FlashlightController : MonoBehaviour
 
         if (isOn)
         {
-            battery -= drainPerSecond * Time.deltaTime;
+            battery -= drainPerSecond * drainMultiplier * Time.deltaTime;
             if (battery <= 0f)
             {
                 battery = 0f;

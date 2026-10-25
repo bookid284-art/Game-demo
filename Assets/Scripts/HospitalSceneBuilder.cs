@@ -137,11 +137,11 @@ public class HospitalSceneBuilder : MonoBehaviour
         WallZ("Wall", -6f, 0f, 14f, new Gap(6.5f, 1.5f, 2.35f));
         WallZ("Wall", 6f, 0f, 14f, new Gap(6.5f, 1.5f, 2.35f));
 
-        WallZ("Wall", -12.2f, 3f, 10f);
+        WallZ("Wall", -12.2f, 3f, 10f, new Gap(6.5f, 1.5f, 2.35f));
         WallX("Wall", -12.2f, -6f, 3f);
         WallX("Wall", -12.2f, -6f, 10f);
 
-        WallZ("Wall", 12.2f, 3f, 10f);
+        WallZ("Wall", 12.2f, 3f, 10f, new Gap(6.5f, 1.5f, 2.35f));
         WallX("Wall", 6f, 12.2f, 3f);
         WallX("Wall", 6f, 12.2f, 10f);
 
@@ -180,9 +180,9 @@ public class HospitalSceneBuilder : MonoBehaviour
         WallX("Wall", 6f, 12f, 72f);
 
         WallX("Wall", -6f, 6f, 72f, new Gap(0f, 1.8f, 2.5f));
-        WallZ("Wall", -6f, 72f, 84f);
-        WallZ("Wall", 6f, 72f, 84f);
-        WallX("Wall", -6f, 6f, 84f);
+        WallZ("Wall", -6f, 72f, 84f, new Gap(78f, 1.6f, 2.35f));
+        WallZ("Wall", 6f, 72f, 84f, new Gap(78f, 1.6f, 2.35f));
+        WallX("Wall", -6f, 6f, 84f, new Gap(0f, 1.8f, 2.5f));
 
         FrameOnZWall(0f, 14f, 1.6f, 2.35f);
         FrameOnZWall(0f, 38f, 1.6f, 2.35f);
@@ -253,7 +253,8 @@ public class HospitalSceneBuilder : MonoBehaviour
         Window(new Vector3(-3.6f, 1.7f, 0.14f));
         Window(new Vector3(3.6f, 1.7f, 0.14f));
         Toilet(new Vector3(10.6f, 0f, 4.2f));
-        Ambulance(new Vector3(-3.3f, 0f, 80.2f));
+        // 车身在 z=78 的东西通道北侧，避免挡住手术室和精神科。
+        Ambulance(new Vector3(-3.3f, 0f, 81.5f));
         geo.Cylinder(level, "PropPipe", new Vector3(-1.55f, 2.95f, 55f), 0.05f, 30f, Quaternion.Euler(90f, 0f, 0f), mats.metal, false);
         geo.Quad(level, "PropBlood", new Vector3(-7.5f, 0.025f, 64.6f), new Vector2(1.2f, 0.75f), Quaternion.Euler(90f, 25f, 0f), mats.blood, false);
         geo.Quad(level, "PropBlood", new Vector3(8.2f, 0.025f, 66.4f), new Vector2(1.4f, 0.9f), Quaternion.Euler(90f, -15f, 0f), mats.blood, false);
@@ -269,12 +270,12 @@ public class HospitalSceneBuilder : MonoBehaviour
         Sign("306", new Vector3(1.78f, 2.35f, 55.5f), Vector3.right, 0.55f, 40, Color.white);
         Sign("307", new Vector3(-1.78f, 2.35f, 65.5f), Vector3.left, 0.55f, 40, new Color(1f, 0.45f, 0.4f));
         Sign("太平间", new Vector3(1.78f, 2.35f, 67f), Vector3.right, 0.9f, 36, new Color(1f, 0.4f, 0.35f));
-        Sign("出口", new Vector3(0f, 2.75f, 71.7f), Vector3.forward, 1.1f, 56, new Color(0.5f, 1f, 0.65f));
+        Sign("装卸区", new Vector3(0f, 2.75f, 71.7f), Vector3.forward, 1.2f, 48, new Color(0.5f, 1f, 0.65f));
 
-        Note("交接记录", "夜班交接：库房、诊室、307 病房各有一把钥匙。紧急出口在病房走廊尽头。那东西只有在你看得见它的时候才会停住。手电筒别一直开着。", new Vector3(-3.15f, 1.28f, 9.05f));
-        Note("护士站备忘", "诊室钥匙在检查床旁边。听到刮擦声就回头，看住它，再移动。不要长时间背对它逃跑。", new Vector3(-1.85f, 1.05f, 27.2f));
-        Note("307 床卡", "出口钥匙塞在床垫侧面。它昨晚从这张床上站起来。看着它。", new Vector3(-8.9f, 0.95f, 66.7f));
-        Note("卫生间告示", "库房在对面。这里没有钥匙。", new Vector3(9.4f, 1.15f, 8.2f));
+        Note("交接记录", "夜班交接残页 1/5。疏散要四个章：急诊、病房、手术、精神科。东边是急诊，西边是行政。装卸闸门不是出口，北围栏认疏散单。那东西只有被看着的时候才停。手电筒别一直开着。", new Vector3(-3.15f, 1.28f, 9.05f), "page1");
+        Note("护士站备忘", "交接残页 2/5。诊室钥匙在检查床旁边。病房章在护士站终端，301、305、306 的呼叫铃都要亮。听到刮擦声就回头，看住它，再走。", new Vector3(-1.85f, 1.05f, 27.2f), "page2");
+        Note("307 床卡", "装卸区钥匙塞在床垫侧面。它只能开走廊尽头的闸门，开不了北围栏。它昨晚从这张床上站起来。看着它。", new Vector3(-8.9f, 0.95f, 66.7f));
+        Note("卫生间告示", "库房在对面。行政在库房再往西。这里没有钥匙。", new Vector3(9.4f, 1.15f, 8.2f));
     }
 
     void BuildActorsAndDoors()
@@ -334,9 +335,9 @@ public class HospitalSceneBuilder : MonoBehaviour
         DoorOnZWall("Door_Ward", "ward", 0f, 38f, 1.6f, 2.3f, 100f, "exam", "需要诊室钥匙", preWard, postWard);
         BuildGate(preGate, bay);
 
-        Key("storage", "库房钥匙", new Vector3(-11.15f, 1.35f, 6.5f), mats.brass);
+        Key("storage", "库房钥匙", new Vector3(-10.9f, 1.35f, 6.5f), mats.brass);
         Key("exam", "诊室钥匙", new Vector3(12.3f, 1.08f, 31.1f), mats.steel);
-        Key("exit", "出口钥匙", new Vector3(-7.8f, 0.92f, 64.65f), mats.keyRed);
+        Key("exit", "装卸区钥匙", new Vector3(-7.8f, 0.92f, 64.65f), mats.keyRed);
         Battery(new Vector3(-1.7f, 1.28f, 9.2f), 0.45f);
         Battery(new Vector3(10.4f, 1.18f, 28.6f), 0.45f);
         Battery(new Vector3(-7.8f, 0.95f, 54.55f), 0.5f);
@@ -363,6 +364,7 @@ public class HospitalSceneBuilder : MonoBehaviour
         hud.flashlight = player.GetComponent<FlashlightController>();
         hud.inventory = player.GetComponent<PlayerInventory>();
         hud.interactor = player.GetComponent<PlayerInteractor>();
+        BuildCampaign();
     }
 
     BasicFirstPersonController BuildPlayer()
@@ -392,7 +394,7 @@ public class HospitalSceneBuilder : MonoBehaviour
         Camera camera = cameraObject.AddComponent<Camera>();
         camera.fieldOfView = 68f;
         camera.nearClipPlane = 0.05f;
-        camera.farClipPlane = 70f;
+        camera.farClipPlane = 140f;
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.backgroundColor = new Color(0.012f, 0.014f, 0.018f);
         cameraObject.AddComponent<AudioListener>();
@@ -488,7 +490,7 @@ public class HospitalSceneBuilder : MonoBehaviour
         return ai;
     }
 
-    void DoorOnZWall(string name, string doorId, float x, float z, float width, float height, float openAngle, string keyId, string hint, int navA, int navB)
+    DoorController DoorOnZWall(string name, string doorId, float x, float z, float width, float height, float openAngle, string keyId, string hint, int navA, int navB)
     {
         GameObject door = new GameObject(name);
         door.transform.SetParent(level, false);
@@ -522,9 +524,10 @@ public class HospitalSceneBuilder : MonoBehaviour
         controller.nav = graph;
         controller.navA = navA;
         controller.navB = navB;
+        return controller;
     }
 
-    void DoorOnXWall(string name, string doorId, float x, float z, float width, float height, float openAngle, string keyId, string hint, int navA, int navB)
+    DoorController DoorOnXWall(string name, string doorId, float x, float z, float width, float height, float openAngle, string keyId, string hint, int navA, int navB)
     {
         GameObject door = new GameObject(name);
         door.transform.SetParent(level, false);
@@ -557,27 +560,38 @@ public class HospitalSceneBuilder : MonoBehaviour
         controller.navA = navA;
         controller.navB = navB;
         controller.consumeKey = !string.IsNullOrEmpty(keyId);
+        return controller;
     }
 
     void BuildGate(int navA, int navB)
     {
-        GameObject gate = new GameObject("EscapeDoor");
+        BuildSlideGate("EscapeDoor", "gate", 0f, 72f, "exit",
+            "装卸闸门锁着，需要 307 病房的钥匙",
+            "装卸闸门开了。北边的围栏还锁着。",
+            navA, navB);
+    }
+
+    void BuildSlideGate(string objectName, string doorId, float x, float z, string keyId, string lockedHint, string openedToast, int navA, int navB)
+    {
+        GameObject gate = new GameObject(objectName);
         gate.transform.SetParent(level, false);
         Transform panel = new GameObject("Panel").transform;
         panel.SetParent(gate.transform, false);
-        panel.position = new Vector3(0f, 0f, 72f);
+        panel.position = new Vector3(x, 0f, z);
         for (int i = 0; i < 6; i++)
         {
-            float x = -0.72f + i * 0.29f;
-            geo.Box(panel, "PropBar", new Vector3(x, 1.2f, 0f), new Vector3(0.06f, 2.4f, 0.06f), mats.metal, Vector2.one, false, false);
+            float bar = -0.72f + i * 0.29f;
+            geo.Box(panel, "PropBar", new Vector3(bar, 1.2f, 0f), new Vector3(0.06f, 2.4f, 0.06f), mats.metal, Vector2.one, false, false);
         }
         geo.Box(panel, "PropBar", new Vector3(0f, 2.45f, 0f), new Vector3(1.7f, 0.1f, 0.08f), mats.metal, Vector2.one, false, false);
         geo.Box(panel, "PropSign", new Vector3(0f, 2.15f, 0.05f), new Vector3(0.7f, 0.28f, 0.02f), mats.exitGlow, Vector2.one, false, false);
-        Collider blocker = MakeBlocker(gate.transform, new Vector3(0f, 1.2f, 72f), new Vector3(1.7f, 2.5f, 0.4f));
+        Collider blocker = MakeBlocker(gate.transform, new Vector3(x, 1.2f, z), new Vector3(1.7f, 2.5f, 0.4f));
 
         EscapeDoor escape = gate.AddComponent<EscapeDoor>();
-        escape.requiredKeyId = "exit";
-        escape.lockedHint = "紧急出口锁着，需要出口钥匙";
+        escape.doorId = doorId;
+        escape.requiredKeyId = keyId;
+        escape.lockedHint = lockedHint;
+        escape.openedToast = openedToast;
         escape.panel = panel;
         escape.blockers = new Collider[] { blocker };
         escape.nav = graph;
@@ -627,7 +641,7 @@ public class HospitalSceneBuilder : MonoBehaviour
         geo.Cylinder(host.transform, "PropCell", Vector3.zero, 0.05f, 0.16f, Quaternion.identity, mats.exitGlow, false);
     }
 
-    void Note(string title, string body, Vector3 position)
+    void Note(string title, string body, Vector3 position, string flagOnRead = null)
     {
         GameObject host = new GameObject("Note");
         host.transform.SetParent(level, false);
@@ -637,6 +651,7 @@ public class HospitalSceneBuilder : MonoBehaviour
         NoteInteractable note = host.AddComponent<NoteInteractable>();
         note.title = title;
         note.body = body;
+        note.flagOnRead = flagOnRead;
         geo.Box(host.transform, "PropPaper", new Vector3(0f, -0.08f, 0f), new Vector3(0.32f, 0.02f, 0.22f), mats.paper, Vector2.one, false, false);
     }
 
@@ -997,8 +1012,9 @@ public class HospitalSceneBuilder : MonoBehaviour
     {
         if (GameObject.Find("HospitalRoot") != null)
             return;
-        Room[] rooms = Rooms();
-        for (int i = 0; i < rooms.Length; i++)
+        List<Room> rooms = new List<Room>(Rooms());
+        AddCampaignRooms(rooms);
+        for (int i = 0; i < rooms.Count; i++)
         {
             Room room = rooms[i];
             Vector3 center = new Vector3((room.x0 + room.x1) * 0.5f, 0.2f, (room.z0 + room.z1) * 0.5f);
@@ -1008,5 +1024,642 @@ public class HospitalSceneBuilder : MonoBehaviour
             Gizmos.color = new Color(0.6f, 0.85f, 1f, 0.9f);
             Gizmos.DrawWireCube(center, size);
         }
+    }
+
+    [System.NonSerialized]
+    Dictionary<string, int> navIds = new Dictionary<string, int>();
+
+    void AddCampaignRooms(List<Room> rooms)
+    {
+        rooms.Add(new Room("AdminHall", -43.6f, -12.2f, 5.2f, 7.8f, true));
+        rooms.Add(new Room("Lockers", -20.2f, -13.4f, 7.8f, 16f, true));
+        rooms.Add(new Room("Break", -27.4f, -20.2f, 7.8f, 16f, true));
+        rooms.Add(new Room("Meeting", -35.2f, -27.4f, 7.8f, 16f, true));
+        rooms.Add(new Room("Memorial", -43.6f, -35.2f, 7.8f, 16f, true));
+        rooms.Add(new Room("Security", -20.2f, -13.4f, -1.5f, 5.2f, true));
+        rooms.Add(new Room("Records", -28.6f, -20.2f, -1.5f, 5.2f, true));
+        rooms.Add(new Room("Archive", -43.6f, -28.6f, -1.5f, 5.2f, true));
+
+        rooms.Add(new Room("ErHall", 12.2f, 45.6f, 5.2f, 7.8f, true));
+        rooms.Add(new Room("TriageA", 13.4f, 20.6f, 7.8f, 16f, true));
+        rooms.Add(new Room("TriageB", 20.6f, 28f, 7.8f, 16f, true));
+        rooms.Add(new Room("TriageC", 28f, 35.4f, 7.8f, 16f, true));
+        rooms.Add(new Room("ErSupply", 35.4f, 45.6f, 7.8f, 16f, true));
+        rooms.Add(new Room("Pharmacy", 13.4f, 22f, -1.5f, 5.2f, true));
+        rooms.Add(new Room("Observe", 22f, 30.5f, -1.5f, 5.2f, true));
+        rooms.Add(new Room("ErTerm", 30.5f, 38.5f, -1.5f, 5.2f, true));
+        rooms.Add(new Room("ErCloset", 38.5f, 45.6f, -1.5f, 5.2f, true));
+
+        rooms.Add(new Room("OrHall", 6f, 43.6f, 76.4f, 79.6f, true));
+        rooms.Add(new Room("OR1", 8f, 16.5f, 79.6f, 90f, true));
+        rooms.Add(new Room("OR2", 16.5f, 25f, 79.6f, 90f, true));
+        rooms.Add(new Room("Valves", 25f, 33.5f, 79.6f, 90f, true));
+        rooms.Add(new Room("Sterile", 33.5f, 43.6f, 79.6f, 90f, true));
+        rooms.Add(new Room("ICU", 14f, 24f, 68f, 76.4f, true));
+        rooms.Add(new Room("SurgLock", 24f, 33f, 68f, 76.4f, true));
+        rooms.Add(new Room("OrTerm", 33f, 43.6f, 68f, 76.4f, true));
+
+        rooms.Add(new Room("PsychHall", -43.6f, -6f, 76.4f, 79.6f, true));
+        rooms.Add(new Room("Group", -16f, -8f, 79.6f, 90f, true));
+        rooms.Add(new Room("Consult", -25f, -16f, 79.6f, 90f, true));
+        rooms.Add(new Room("PsychFiles", -34f, -25f, 79.6f, 90f, true));
+        rooms.Add(new Room("PsychTerm", -43.6f, -34f, 79.6f, 90f, true));
+        rooms.Add(new Room("Quiet", -22f, -12.4f, 68f, 76.4f, true));
+        rooms.Add(new Room("Cells", -32f, -22f, 68f, 76.4f, true));
+        rooms.Add(new Room("PsychOffice", -43.6f, -32f, 68f, 76.4f, true));
+
+        rooms.Add(new Room("Yard", -6f, 6f, 84f, 108f, false));
+    }
+
+    void BuildCampaign()
+    {
+        List<Room> rooms = new List<Room>();
+        AddCampaignRooms(rooms);
+        for (int i = 0; i < rooms.Count; i++)
+            Zone(rooms[i]);
+        BuildCampaignWalls();
+        BuildCampaignNav();
+        BuildCampaignStory();
+    }
+
+    void Zone(Room room)
+    {
+        float sx = room.x1 - room.x0;
+        float sz = room.z1 - room.z0;
+        Vector3 center = new Vector3((room.x0 + room.x1) * 0.5f, -0.1f, (room.z0 + room.z1) * 0.5f);
+        geo.Box(level, "Floor", center, new Vector3(sx, 0.2f, sz), mats.floor, new Vector2(sx / 1.6f, sz / 1.6f), true, true);
+        if (!room.ceiling)
+            return;
+        geo.Box(level, "Ceil", new Vector3(center.x, WallH + 0.06f, center.z), new Vector3(sx, 0.12f, sz), mats.ceiling, new Vector2(sx / 2.2f, sz / 2.2f), true, true);
+    }
+
+    void BuildCampaignWalls()
+    {
+        const float gapW = 1.4f;
+        const float gapH = 2.35f;
+
+        WallX("Wall", -43.6f, -12.2f, 7.8f,
+            new Gap(-16.8f, gapW, gapH),
+            new Gap(-23.8f, gapW, gapH),
+            new Gap(-31.3f, gapW, gapH),
+            new Gap(-39.4f, gapW, gapH));
+        WallX("Wall", -43.6f, -12.2f, 5.2f,
+            new Gap(-16.8f, gapW, gapH),
+            new Gap(-24.4f, gapW, gapH));
+        WallZ("Wall", -43.6f, 5.2f, 7.8f);
+        WallX("Wall", -43.6f, -13.4f, 16f);
+        WallZ("Wall", -13.4f, 7.8f, 16f);
+        WallZ("Wall", -20.2f, 7.8f, 16f);
+        WallZ("Wall", -27.4f, 7.8f, 16f);
+        WallZ("Wall", -35.2f, 7.8f, 16f);
+        WallZ("Wall", -43.6f, 7.8f, 16f);
+        WallX("Wall", -43.6f, -13.4f, -1.5f);
+        WallZ("Wall", -13.4f, -1.5f, 5.2f);
+        WallZ("Wall", -20.2f, -1.5f, 5.2f);
+        WallZ("Wall", -28.6f, -1.5f, 5.2f, new Gap(1.85f, gapW, gapH));
+        WallZ("Wall", -43.6f, -1.5f, 5.2f);
+
+        WallX("Wall", 12.2f, 45.6f, 7.8f,
+            new Gap(17f, gapW, gapH),
+            new Gap(24.3f, gapW, gapH),
+            new Gap(31.7f, gapW, gapH),
+            new Gap(40.5f, gapW, gapH));
+        WallX("Wall", 12.2f, 45.6f, 5.2f,
+            new Gap(17.7f, gapW, gapH),
+            new Gap(26.2f, gapW, gapH),
+            new Gap(34.5f, gapW, gapH),
+            new Gap(42f, gapW, gapH));
+        WallZ("Wall", 45.6f, 5.2f, 7.8f);
+        WallX("Wall", 13.4f, 45.6f, 16f);
+        WallZ("Wall", 13.4f, 7.8f, 16f);
+        WallZ("Wall", 20.6f, 7.8f, 16f);
+        WallZ("Wall", 28f, 7.8f, 16f);
+        WallZ("Wall", 35.4f, 7.8f, 16f);
+        WallZ("Wall", 45.6f, 7.8f, 16f);
+        WallX("Wall", 13.4f, 45.6f, -1.5f);
+        WallZ("Wall", 13.4f, -1.5f, 5.2f);
+        WallZ("Wall", 22f, -1.5f, 5.2f);
+        WallZ("Wall", 30.5f, -1.5f, 5.2f);
+        WallZ("Wall", 38.5f, -1.5f, 5.2f);
+        WallZ("Wall", 45.6f, -1.5f, 5.2f);
+
+        WallX("Wall", 6f, 43.6f, 79.6f,
+            new Gap(12.25f, gapW, gapH),
+            new Gap(20.75f, gapW, gapH),
+            new Gap(29.25f, gapW, gapH),
+            new Gap(38.55f, gapW, gapH));
+        WallX("Wall", 6f, 43.6f, 76.4f,
+            new Gap(19f, gapW, gapH),
+            new Gap(28.5f, gapW, gapH),
+            new Gap(38.3f, gapW, gapH));
+        WallZ("Wall", 43.6f, 76.4f, 79.6f);
+        WallX("Wall", 8f, 43.6f, 90f);
+        WallZ("Wall", 8f, 79.6f, 90f);
+        WallZ("Wall", 16.5f, 79.6f, 90f);
+        WallZ("Wall", 25f, 79.6f, 90f);
+        WallZ("Wall", 33.5f, 79.6f, 90f);
+        WallZ("Wall", 43.6f, 79.6f, 90f);
+        WallX("Wall", 14f, 43.6f, 68f);
+        WallZ("Wall", 14f, 68f, 76.4f);
+        WallZ("Wall", 24f, 68f, 76.4f);
+        WallZ("Wall", 33f, 68f, 76.4f);
+        WallZ("Wall", 43.6f, 68f, 76.4f);
+
+        WallX("Wall", -43.6f, -6f, 79.6f,
+            new Gap(-12f, gapW, gapH),
+            new Gap(-20.5f, gapW, gapH),
+            new Gap(-29.5f, gapW, gapH),
+            new Gap(-38.8f, gapW, gapH));
+        WallX("Wall", -43.6f, -6f, 76.4f,
+            new Gap(-17.2f, gapW, gapH),
+            new Gap(-27f, gapW, gapH),
+            new Gap(-37.8f, gapW, gapH));
+        WallZ("Wall", -43.6f, 76.4f, 79.6f);
+        WallX("Wall", -43.6f, -8f, 90f);
+        WallZ("Wall", -8f, 79.6f, 90f);
+        WallZ("Wall", -16f, 79.6f, 90f);
+        WallZ("Wall", -25f, 79.6f, 90f);
+        WallZ("Wall", -34f, 79.6f, 90f);
+        WallZ("Wall", -43.6f, 79.6f, 90f);
+        WallX("Wall", -43.6f, -12.4f, 68f);
+        WallZ("Wall", -12.4f, 68f, 76.4f);
+        WallZ("Wall", -22f, 68f, 76.4f);
+        WallZ("Wall", -32f, 68f, 76.4f);
+        WallZ("Wall", -43.6f, 68f, 76.4f);
+
+        WallZ("Wall", -6f, 84f, 108f);
+        WallZ("Wall", 6f, 84f, 108f);
+        WallX("Wall", -6f, 6f, 108f);
+    }
+
+    void BuildCampaignNav()
+    {
+        const float doorW = 1.3f;
+        const float doorH = 2.3f;
+
+        int aJoin = Nav("a_join", -13.2f, 6.5f);
+        int aMid = Nav("a_mid", -16.8f, 6.5f);
+        int aBreak = Nav("a_break", -23.8f, 6.5f);
+        int aRec = Nav("a_rec", -24.4f, 6.5f);
+        int aMeet = Nav("a_meet", -31.3f, 6.5f);
+        int aMem = Nav("a_mem", -39.4f, 6.5f);
+        int nLock = Nav("n_lock", -16.8f, 12f);
+        int nBreak = Nav("n_break", -23.8f, 12f);
+        int nMeet = Nav("n_meet", -31.3f, 12f);
+        int nMem = Nav("n_mem", -39.4f, 12f);
+        int nSec = Nav("n_sec", -16.8f, 1.8f);
+        int nRec = Nav("n_rec", -24.4f, 1.8f);
+        int nArc = Nav("n_arc", -36f, 1.85f);
+
+        graph.AddLink(FindNode("storage"), aJoin, true);
+        graph.AddLink(aJoin, aMid, true);
+        graph.AddLink(aMid, aBreak, true);
+        graph.AddLink(aBreak, aRec, true);
+        graph.AddLink(aRec, aMeet, true);
+        graph.AddLink(aMeet, aMem, true);
+        graph.AddLink(aMid, nLock, false);
+        graph.AddLink(aBreak, nBreak, false);
+        graph.AddLink(aMeet, nMeet, false);
+        graph.AddLink(aMem, nMem, false);
+        graph.AddLink(aMid, nSec, false);
+        graph.AddLink(aRec, nRec, false);
+        graph.AddLink(nRec, nArc, true);
+
+        DoorOnZWall("Door_Lockers", "lockers", -16.8f, 7.8f, doorW, doorH, 100f, "", "更衣室的门卡住了", aMid, nLock);
+        DoorOnZWall("Door_Break", "break", -23.8f, 7.8f, doorW, doorH, 100f, "", "休息室的门卡住了", aBreak, nBreak);
+        DoorOnZWall("Door_Meet", "meet", -31.3f, 7.8f, doorW, doorH, 100f, "", "会议室的门卡住了", aMeet, nMeet);
+        DoorOnZWall("Door_Memorial", "memorial", -39.4f, 7.8f, doorW, doorH, 100f, "", "纪念角的门卡住了", aMem, nMem);
+        DoorController securityDoor = DoorOnZWall("Door_Security", "security", -16.8f, 5.2f, doorW, doorH, -100f, "kp_security", "先用旁边的键盘", aMid, nSec);
+        DoorOnZWall("Door_Records", "records", -24.4f, 5.2f, doorW, doorH, -100f, "archive", "档案室要门禁里的钥匙", aRec, nRec);
+        Keypad(securityDoor, "4719", "行政门禁", new Vector3(-15.5f, 1.28f, 5.85f), "");
+
+        int eJoin = Nav("e_join", 13.6f, 6.5f);
+        int eA = Nav("e_a", 17f, 6.5f);
+        int ePh = Nav("e_ph", 17.7f, 6.5f);
+        int eB = Nav("e_b", 24.3f, 6.5f);
+        int eObs = Nav("e_obs", 26.2f, 6.5f);
+        int eC = Nav("e_c", 31.7f, 6.5f);
+        int eTerm = Nav("e_term", 34.5f, 6.5f);
+        int eSup = Nav("e_sup", 40.5f, 6.5f);
+        int eClo = Nav("e_clo", 42f, 6.5f);
+        int nA = Nav("n_a", 17f, 12f);
+        int nB = Nav("n_b", 24.3f, 12f);
+        int nC = Nav("n_c", 31.7f, 12f);
+        int nSup = Nav("n_sup", 40.5f, 12f);
+        int nPh = Nav("n_ph", 17.7f, 1.8f);
+        int nObs = Nav("n_obs", 26.2f, 1.8f);
+        int nEr = Nav("n_er", 34.5f, 1.8f);
+        int nClo = Nav("n_clo", 42f, 1.8f);
+
+        graph.AddLink(FindNode("rest"), eJoin, true);
+        graph.AddLink(eJoin, eA, true);
+        graph.AddLink(eA, ePh, true);
+        graph.AddLink(ePh, eB, true);
+        graph.AddLink(eB, eObs, true);
+        graph.AddLink(eObs, eC, true);
+        graph.AddLink(eC, eTerm, true);
+        graph.AddLink(eTerm, eSup, true);
+        graph.AddLink(eSup, eClo, true);
+        graph.AddLink(eA, nA, false);
+        graph.AddLink(eB, nB, false);
+        graph.AddLink(eC, nC, false);
+        graph.AddLink(eSup, nSup, false);
+        graph.AddLink(ePh, nPh, false);
+        graph.AddLink(eObs, nObs, false);
+        graph.AddLink(eTerm, nEr, false);
+        graph.AddLink(eClo, nClo, false);
+
+        DoorOnZWall("Door_TriageA", "triageA", 17f, 7.8f, doorW, doorH, 100f, "", "分诊室的门卡住了", eA, nA);
+        DoorOnZWall("Door_TriageB", "triageB", 24.3f, 7.8f, doorW, doorH, 100f, "", "分诊室的门卡住了", eB, nB);
+        DoorOnZWall("Door_TriageC", "triageC", 31.7f, 7.8f, doorW, doorH, 100f, "", "分诊室的门卡住了", eC, nC);
+        DoorOnZWall("Door_ErSupply", "erSupply", 40.5f, 7.8f, doorW, doorH, 100f, "", "库房的门卡住了", eSup, nSup);
+        DoorController pharmacyDoor = DoorOnZWall("Door_Pharmacy", "pharmacy", 17.7f, 5.2f, doorW, doorH, -100f, "kp_pharmacy", "药房要四位密码", ePh, nPh);
+        DoorOnZWall("Door_Observe", "observe", 26.2f, 5.2f, doorW, doorH, -100f, "", "观察室的门卡住了", eObs, nObs);
+        DoorOnZWall("Door_ErTerm", "erTerm", 34.5f, 5.2f, doorW, doorH, -100f, "", "终端室的门卡住了", eTerm, nEr);
+        DoorOnZWall("Door_ErCloset", "erCloset", 42f, 5.2f, doorW, doorH, -100f, "", "杂物间的门卡住了", eClo, nClo);
+        Keypad(pharmacyDoor, "8360", "药房", new Vector3(18.8f, 1.28f, 5.85f), "pharmacy_open");
+
+        int sJoin = Nav("s_join", 8f, 78f);
+        int sOr1 = Nav("s_or1", 12.25f, 78f);
+        int sIcu = Nav("s_icu", 19f, 78f);
+        int sOr2 = Nav("s_or2", 20.75f, 78f);
+        int sLock = Nav("s_lock", 28.5f, 78f);
+        int sValve = Nav("s_valve", 29.25f, 78f);
+        int sTerm = Nav("s_term", 38.3f, 78f);
+        int sSter = Nav("s_ster", 38.55f, 78f);
+        int nOr1 = Nav("n_or1", 12.25f, 85f);
+        int nOr2 = Nav("n_or2", 20.75f, 85f);
+        int nValve = Nav("n_valve", 29.25f, 85f);
+        int nSter = Nav("n_ster", 38.55f, 85f);
+        int nIcu = Nav("n_icu", 19f, 72f);
+        int nSLock = Nav("n_slock", 28.5f, 72f);
+        int nOrTerm = Nav("n_orterm", 38.3f, 72f);
+
+        int bay = FindNode("bay");
+        graph.AddLink(bay, sJoin, true);
+        graph.AddLink(sJoin, sOr1, true);
+        graph.AddLink(sOr1, sIcu, true);
+        graph.AddLink(sIcu, sOr2, true);
+        graph.AddLink(sOr2, sLock, true);
+        graph.AddLink(sLock, sValve, true);
+        graph.AddLink(sValve, sTerm, true);
+        graph.AddLink(sTerm, sSter, true);
+        graph.AddLink(sOr1, nOr1, false);
+        graph.AddLink(sOr2, nOr2, false);
+        graph.AddLink(sValve, nValve, false);
+        graph.AddLink(sSter, nSter, false);
+        graph.AddLink(sIcu, nIcu, false);
+        graph.AddLink(sLock, nSLock, false);
+        graph.AddLink(sTerm, nOrTerm, false);
+
+        DoorOnZWall("Door_OR1", "or1", 12.25f, 79.6f, doorW, doorH, 100f, "", "手术间的门卡住了", sOr1, nOr1);
+        DoorOnZWall("Door_OR2", "or2", 20.75f, 79.6f, doorW, doorH, 100f, "", "手术间的门卡住了", sOr2, nOr2);
+        DoorOnZWall("Door_Valves", "valves", 29.25f, 79.6f, doorW, doorH, 100f, "", "阀门间的门卡住了", sValve, nValve);
+        DoorOnZWall("Door_Sterile", "sterile", 38.55f, 79.6f, doorW, doorH, 100f, "", "无菌室的门卡住了", sSter, nSter);
+        DoorOnZWall("Door_ICU", "icu", 19f, 76.4f, doorW, doorH, -100f, "", "监护室的门卡住了", sIcu, nIcu);
+        DoorOnZWall("Door_SurgLock", "surgLock", 28.5f, 76.4f, doorW, doorH, -100f, "", "更衣室的门卡住了", sLock, nSLock);
+        DoorOnZWall("Door_OrTerm", "orTerm", 38.3f, 76.4f, doorW, doorH, -100f, "", "终端室的门卡住了", sTerm, nOrTerm);
+
+        int pJoin = Nav("p_join", -8f, 78f);
+        int pGroup = Nav("p_group", -12f, 78f);
+        int pQuiet = Nav("p_quiet", -17.2f, 78f);
+        int pConsult = Nav("p_consult", -20.5f, 78f);
+        int pCells = Nav("p_cells", -27f, 78f);
+        int pFiles = Nav("p_files", -29.5f, 78f);
+        int pOffice = Nav("p_office", -37.8f, 78f);
+        int pTerm = Nav("p_term", -38.8f, 78f);
+        int nGroup = Nav("n_group", -12f, 85f);
+        int nConsult = Nav("n_consult", -20.5f, 85f);
+        int nFiles = Nav("n_files", -29.5f, 85f);
+        int nPTerm = Nav("n_pterm", -38.8f, 85f);
+        int nQuiet = Nav("n_quiet", -17.2f, 72f);
+        int nCells = Nav("n_cells", -27f, 72f);
+        int nPOffice = Nav("n_poffice", -37.8f, 72f);
+
+        graph.AddLink(bay, pJoin, true);
+        graph.AddLink(pJoin, pGroup, true);
+        graph.AddLink(pGroup, pQuiet, true);
+        graph.AddLink(pQuiet, pConsult, true);
+        graph.AddLink(pConsult, pCells, true);
+        graph.AddLink(pCells, pFiles, true);
+        graph.AddLink(pFiles, pOffice, true);
+        graph.AddLink(pOffice, pTerm, true);
+        graph.AddLink(pGroup, nGroup, false);
+        graph.AddLink(pConsult, nConsult, false);
+        graph.AddLink(pFiles, nFiles, false);
+        graph.AddLink(pTerm, nPTerm, false);
+        graph.AddLink(pQuiet, nQuiet, false);
+        graph.AddLink(pCells, nCells, false);
+        graph.AddLink(pOffice, nPOffice, false);
+
+        DoorOnZWall("Door_Group", "group", -12f, 79.6f, doorW, doorH, 100f, "", "团体室的门卡住了", pGroup, nGroup);
+        DoorOnZWall("Door_Consult", "consult", -20.5f, 79.6f, doorW, doorH, 100f, "", "咨询室的门卡住了", pConsult, nConsult);
+        DoorOnZWall("Door_Files", "psychFiles", -29.5f, 79.6f, doorW, doorH, 100f, "", "病历室的门卡住了", pFiles, nFiles);
+        DoorController psychDoor = DoorOnZWall("Door_PsychTerm", "psychTerm", -38.8f, 79.6f, doorW, doorH, 100f, "kp_psych", "密码写在《零号观察》里", pTerm, nPTerm);
+        DoorOnZWall("Door_Quiet", "quiet", -17.2f, 76.4f, doorW, doorH, -100f, "quiet", "安静室的钥匙在太平间", pQuiet, nQuiet);
+        DoorOnZWall("Door_Cells", "cells", -27f, 76.4f, doorW, doorH, -100f, "", "观察室的门卡住了", pCells, nCells);
+        DoorOnZWall("Door_PsychOffice", "psychOffice", -37.8f, 76.4f, doorW, doorH, -100f, "", "办公室的门卡住了", pOffice, nPOffice);
+        Keypad(psychDoor, "2648", "精神科终端", new Vector3(-37.4f, 1.28f, 78.85f), "");
+
+        int yard = Nav("yard", 0f, 92f);
+        int road = Nav("road", 0f, 104f);
+        graph.AddLink(bay, yard, false);
+        graph.AddLink(yard, road, true);
+        // 围栏打开后也不把这条边交给怪物，它停在围栏内侧。
+        BuildSlideGate("FenceGate", "outer", 0f, 84f, "auth",
+            "北围栏锁着，要行政室打印的疏散单",
+            "围栏开了，往北跑",
+            -1, -1);
+    }
+
+    void BuildCampaignStory()
+    {
+        Color warm = new Color(1f, 0.78f, 0.55f);
+        Color sick = new Color(0.7f, 0.9f, 0.75f);
+        Color red = new Color(0.9f, 0.35f, 0.28f);
+        Color cool = new Color(0.75f, 0.86f, 1f);
+
+        Sign("东急诊  西行政  北病房", new Vector3(0f, 2.15f, 0.22f), Vector3.back, 2.4f, 40, new Color(0.9f, 0.92f, 0.85f));
+        Sign("东手术  西精神  北围栏", new Vector3(5.72f, 2.3f, 76.2f), Vector3.right, 1.8f, 36, new Color(0.8f, 0.95f, 0.85f));
+        Sign("更衣室", new Vector3(-16.8f, 2.45f, 7.55f), Vector3.forward, 0.9f, 36, Color.white);
+        Sign("休息室", new Vector3(-23.8f, 2.45f, 7.55f), Vector3.forward, 0.9f, 36, Color.white);
+        Sign("会议室", new Vector3(-31.3f, 2.45f, 7.55f), Vector3.forward, 0.9f, 36, Color.white);
+        Sign("纪念角", new Vector3(-39.4f, 2.45f, 7.55f), Vector3.forward, 0.9f, 36, new Color(0.95f, 0.8f, 0.7f));
+        Sign("门禁", new Vector3(-16.8f, 2.45f, 5.45f), Vector3.back, 0.7f, 36, new Color(1f, 0.8f, 0.45f));
+        Sign("档案室", new Vector3(-24.4f, 2.45f, 5.45f), Vector3.back, 0.9f, 36, new Color(1f, 0.8f, 0.45f));
+        Sign("分诊", new Vector3(17f, 2.45f, 7.55f), Vector3.forward, 0.7f, 36, Color.white);
+        Sign("药房", new Vector3(17.7f, 2.45f, 5.45f), Vector3.back, 0.7f, 36, new Color(0.7f, 1f, 0.75f));
+        Sign("手术", new Vector3(12.25f, 2.45f, 79.35f), Vector3.forward, 0.7f, 36, new Color(0.8f, 0.9f, 1f));
+        Sign("阀门", new Vector3(29.25f, 2.45f, 79.35f), Vector3.forward, 0.7f, 36, new Color(1f, 0.7f, 0.45f));
+        Sign("精神科", new Vector3(-29.5f, 2.45f, 79.35f), Vector3.forward, 1.1f, 36, new Color(0.85f, 0.8f, 1f));
+        Sign("安静室", new Vector3(-17.2f, 2.45f, 76.65f), Vector3.back, 0.9f, 32, new Color(1f, 0.45f, 0.4f));
+        Sign("界外", new Vector3(0f, 2.3f, 107.7f), Vector3.forward, 1.2f, 48, new Color(0.6f, 1f, 0.7f));
+
+        RoomLamp(-16.8f, 12f, warm, false);
+        RoomLamp(-23.8f, 12f, warm, true);
+        RoomLamp(-31.3f, 12f, warm, false);
+        RoomLamp(-39.4f, 12f, warm, true);
+        RoomLamp(-16.8f, 1.8f, warm, true);
+        RoomLamp(-32f, 1.8f, warm, false);
+        RoomLamp(17f, 12f, sick, true);
+        RoomLamp(24.3f, 12f, sick, false);
+        RoomLamp(31.7f, 12f, sick, true);
+        RoomLamp(40.5f, 12f, sick, false);
+        RoomLamp(17.7f, 1.8f, sick, false);
+        RoomLamp(26.2f, 1.8f, sick, true);
+        RoomLamp(34.5f, 1.8f, sick, false);
+        RoomLamp(12.25f, 85f, cool, true);
+        RoomLamp(20.75f, 85f, cool, false);
+        RoomLamp(29.25f, 85f, red, true);
+        RoomLamp(38.55f, 85f, cool, false);
+        RoomLamp(19f, 72f, red, true);
+        RoomLamp(38.3f, 72f, cool, false);
+        RoomLamp(-12f, 85f, cool, true);
+        RoomLamp(-20.5f, 85f, cool, false);
+        RoomLamp(-29.5f, 85f, cool, true);
+        RoomLamp(-38.8f, 85f, cool, false);
+        RoomLamp(-17.2f, 72f, red, true);
+        RoomLamp(-27f, 72f, cool, true);
+        RoomLamp(-37.8f, 72f, warm, false);
+        Lamp(new Vector3(0f, 4.2f, 94f), cool, 1.6f, 14f, false, true);
+        Lamp(new Vector3(0f, 4.2f, 104f), cool, 1.8f, 16f, false, true);
+
+        Note("林夏 1", "储物柜纸条：旧门禁 0512 已经作废。我今晚要去档案室对名册。别用墙上那组废码。", new Vector3(-14.6f, 1.15f, 14.4f), "linxia1");
+        Note("休息室血压", "昨夜收缩压停在 47。行政门禁用前两位。灯坏了也别在这儿久站。", new Vector3(-26.2f, 1.1f, 14.2f));
+        Note("林夏 2", "林夏：休息室的灯又自己灭了。如果我没回更衣室，去纪念角看第三张纸条。", new Vector3(-21.6f, 1.05f, 13.6f), "linxia2");
+        Note("会议签到", "出席 19 人。门禁后两位用这个数。散会后钥匙仍放在门禁室，不放前台。", new Vector3(-33.8f, 1.1f, 14.3f));
+        Note("林夏 3", "林夏：四张纸条都读到的话，备用电池算给你。我还要去安静室看最后一眼。", new Vector3(-41.4f, 1.15f, 14.2f), "linxia3");
+        Note("零号观察", "手术阀门顺序：白、绿、红、蓝。扳错会全部弹回。精神科终端密码 2648。安静室不要一个人进。", new Vector3(-33.2f, 1.05f, 4.35f), "orders_read");
+        Note("交接残页 3", "交接残页 3/5。疏散单只能在档案室这台打印机上出。章没齐，它不吐纸。", new Vector3(-40.4f, 1.05f, 0.4f), "page3");
+        Note("林夏补记", "林夏：名册如果对不上，就不要开别的抽屉。刮擦声会顺着管道走。", new Vector3(-38.5f, 1.05f, 3.9f));
+
+        Note("分诊甲", "腕带登记：药房密码第一位是 8。镇静剂还差三支，别只拿这一支。", new Vector3(15f, 1.1f, 14.2f));
+        Note("分诊乙", "第二位是 3。上次有人抄成 5，药房锁了一整夜。", new Vector3(22.2f, 1.1f, 14.2f));
+        Note("分诊丙", "输液袋上写着第三位 6。末位不在这间。", new Vector3(29.6f, 1.1f, 14.3f));
+        Note("观察记录", "监护仪末位是 0。交接残页 4/5：北围栏认打印机，不认装卸区的钥匙。", new Vector3(24f, 1.1f, 0.6f), "page4");
+        Note("药房告示", "紧急密码 2024 已经作废。新密码拆在四间分诊和观察记录里。柜子要等四支镇静剂回来。", new Vector3(16.2f, 1.15f, 5.85f));
+        Note("急诊终端", "先打开药房，这台机器才接受急诊章。", new Vector3(36.2f, 1.15f, 1.2f));
+
+        Note("阀门残页", "白板上的顺序被水泡掉了。完整顺序在行政档案《零号观察》，不要凭手感乱扳。", new Vector3(31.6f, 1.15f, 87.5f));
+        Note("未完成的手术", "血袋应在监护室、一号手术间和太平间冷柜。三袋都放回二号手术间的器械台。", new Vector3(18.2f, 1.1f, 86.5f));
+        Note("手术终端", "阀门没有归位之前，这台终端是黑的。", new Vector3(40.8f, 1.15f, 70.6f));
+
+        Note("团体治疗", "今晚的团体治疗取消。终端在走廊西头，密码不在这间。", new Vector3(-10.2f, 1.1f, 86.4f));
+        Note("废码", "复印件上的 7751 是测试码，终端不收。去看《零号观察》。", new Vector3(-27.2f, 1.1f, 87.2f));
+        Note("交接残页 5", "交接残页 5/5。它过了装卸闸门之后，只有你看着它，走廊才过得去。", new Vector3(-40.6f, 1.1f, 70.8f), "page5");
+        Note("林夏 4", "林夏：我把名字留在安静室的床头。你若读到这里，夜班就不只是我一个人的了。", new Vector3(-19.4f, 1.05f, 70.2f), "linxia4");
+        Note("床头刻名", "床头刻着值班人的名字。登记表上，最后一个签字的人已经在这张床上躺过。", new Vector3(-14.2f, 0.95f, 73.4f), "quiet_read");
+
+        Note("太平间名册", "今晚只核对腕带 307-19。其余抽屉不要开，声音会把走廊里的东西引过来。", new Vector3(3.6f, 1.1f, 64.6f));
+
+        Key("archive", "档案室钥匙", new Vector3(-18.8f, 1.15f, 0.5f), mats.brass);
+        Cell(-25.4f, 13.2f);
+        Cell(-34.5f, 3.6f);
+        Cell(19.4f, 3.2f);
+        Cell(28.8f, 1.2f);
+        Cell(43.2f, 1.4f);
+        Cell(36.2f, 86.4f);
+        Cell(16.2f, 70.4f);
+        Cell(-22.8f, 86.6f);
+        Cell(-29.2f, 70.6f);
+        Battery(new Vector3(-12.6f, 1.05f, 32.2f), 0.45f);
+        Battery(new Vector3(5.2f, 0.9f, 47.6f), 0.45f);
+        Battery(new Vector3(4.4f, 0.9f, 57.2f), 0.45f);
+
+        Vial("vial1", new Vector3(18.8f, 0.95f, 14.6f));
+        Vial("vial2", new Vector3(26.4f, 0.95f, 13.4f));
+        Vial("vial3", new Vector3(33.6f, 0.95f, 14.5f));
+        Vial("vial4", new Vector3(42.8f, 0.95f, 13.8f));
+        TurnIn("归还镇静剂", "vial1,vial2,vial3,vial4", "pharmacy_done", "drain", "四支镇静剂还没齐", "手电没那么费电了", new Vector3(15.2f, 1.05f, 0.8f));
+
+        BloodBag("bag1", new Vector3(16.4f, 0.95f, 70.8f));
+        BloodBag("bag2", new Vector3(10.2f, 0.95f, 87.2f));
+        BloodBag("bag3", new Vector3(10.6f, 0.9f, 69.4f));
+        TurnIn("放回血袋", "bag1,bag2,bag3", "surgery_done", "stamina", "三袋血还没齐", "呼吸稳一些了，体力回得更快", new Vector3(22.4f, 1.05f, 87.4f));
+
+        CallButton("call301", "301 呼叫铃", new Vector3(-4.5f, 1.2f, 47.5f));
+        CallButton("call305", "305 呼叫铃", new Vector3(-4.5f, 1.2f, 57.3f));
+        CallButton("call306", "306 呼叫铃", new Vector3(5.1f, 1.2f, 57.3f));
+        Terminal("stamp_ward", "call301,call305,call306", "301、305、306 的呼叫铃还没亮", new Vector3(3.5f, 1.15f, 33.4f));
+        Terminal("stamp_er", "pharmacy_open", "药房还锁着，急诊章盖不上去", new Vector3(36.4f, 1.15f, 3.2f));
+        Terminal("stamp_or", "valves", "阀门没有归位，终端是黑的", new Vector3(41.2f, 1.15f, 72.4f));
+        Terminal("stamp_psych", "", "", new Vector3(-40.8f, 1.15f, 86.2f));
+
+        Valve("白", new Vector3(26.4f, 1.15f, 88.2f), mats.brass);
+        Valve("绿", new Vector3(28.2f, 1.15f, 88.2f), mats.exitGlow);
+        Valve("红", new Vector3(30.6f, 1.15f, 88.2f), mats.keyRed);
+        Valve("蓝", new Vector3(32.2f, 1.15f, 88.2f), mats.steel);
+        Sign("白", new Vector3(26.4f, 1.7f, 88.2f), Vector3.forward, 0.28f, 40, Color.white);
+        Sign("绿", new Vector3(28.2f, 1.7f, 88.2f), Vector3.forward, 0.28f, 40, Color.white);
+        Sign("红", new Vector3(30.6f, 1.7f, 88.2f), Vector3.forward, 0.28f, 40, Color.white);
+        Sign("蓝", new Vector3(32.2f, 1.7f, 88.2f), Vector3.forward, 0.28f, 40, Color.white);
+
+        Drawer("301-02", false, new Vector3(4.4f, 0.85f, 70.3f));
+        Drawer("305-11", false, new Vector3(6.6f, 0.85f, 70.3f));
+        Drawer("307-19", true, new Vector3(8.8f, 0.85f, 70.3f));
+        Drawer("306-08", false, new Vector3(10.6f, 0.85f, 70.3f));
+
+        Printer(new Vector3(-40.6f, 1.05f, 2.45f));
+        geo.Box(level, "PropShelf", new Vector3(-36.5f, 0.8f, 0.15f), new Vector3(5.5f, 1.6f, 0.45f), mats.wood, Vector2.one, true, true);
+        geo.Box(level, "PropShelf", new Vector3(-39.5f, 0.8f, 4.55f), new Vector3(4.2f, 1.6f, 0.4f), mats.wood, Vector2.one, true, true);
+        geo.Box(level, "PropCrate", new Vector3(-3.4f, 0.45f, 93f), new Vector3(1.1f, 0.9f, 0.8f), mats.wood, Vector2.one, true, true);
+        geo.Box(level, "PropCrate", new Vector3(3.5f, 0.4f, 98.5f), new Vector3(0.9f, 0.8f, 1.2f), mats.metal, Vector2.one, true, true);
+        Desk(new Vector3(-40.2f, 0f, 3.4f));
+    }
+
+    int Nav(string nodeName, float x, float z)
+    {
+        int index = graph.AddNode(nodeName, x, z);
+        navIds[nodeName] = index;
+        return index;
+    }
+
+    int FindNode(string nodeName)
+    {
+        for (int i = 0; i < graph.names.Count; i++)
+        {
+            if (graph.names[i] == nodeName)
+                return i;
+        }
+        Debug.LogError("找不到导航点 " + nodeName);
+        return 0;
+    }
+
+    void RoomLamp(float x, float z, Color color, bool flicker)
+    {
+        Lamp(new Vector3(x, 3.02f, z), color, 0.7f, 7.5f, flicker, false);
+    }
+
+    void Cell(float x, float z)
+    {
+        Battery(new Vector3(x, 0.95f, z), 0.45f);
+    }
+
+    void Keypad(DoorController door, string code, string title, Vector3 position, string flagOnSuccess)
+    {
+        GameObject host = new GameObject("Keypad");
+        host.transform.SetParent(level, false);
+        host.transform.position = position;
+        BoxCollider box = host.AddComponent<BoxCollider>();
+        box.size = new Vector3(0.45f, 0.5f, 0.35f);
+        KeypadLock pad = host.AddComponent<KeypadLock>();
+        pad.code = code;
+        pad.title = title;
+        pad.door = door;
+        pad.flagOnSuccess = flagOnSuccess;
+        geo.Box(host.transform, "PropPad", Vector3.zero, new Vector3(0.24f, 0.34f, 0.06f), mats.metal, Vector2.one, false, false);
+        geo.Box(host.transform, "PropScreen", new Vector3(0f, 0.06f, -0.04f), new Vector3(0.14f, 0.08f, 0.012f), mats.screen, Vector2.one, false, false);
+    }
+
+    void Vial(string flagId, Vector3 position)
+    {
+        GameObject host = new GameObject("Vial_" + flagId);
+        host.transform.SetParent(level, false);
+        host.transform.position = position;
+        BoxCollider box = host.AddComponent<BoxCollider>();
+        box.size = new Vector3(0.28f, 0.4f, 0.28f);
+        QuestPickup pickup = host.AddComponent<QuestPickup>();
+        pickup.flagId = flagId;
+        pickup.displayName = "镇静剂";
+        geo.Cylinder(host.transform, "PropVial", Vector3.zero, 0.035f, 0.16f, Quaternion.identity, mats.exitGlow, false);
+    }
+
+    void BloodBag(string flagId, Vector3 position)
+    {
+        GameObject host = new GameObject("Bag_" + flagId);
+        host.transform.SetParent(level, false);
+        host.transform.position = position;
+        BoxCollider box = host.AddComponent<BoxCollider>();
+        box.size = new Vector3(0.35f, 0.4f, 0.28f);
+        QuestPickup pickup = host.AddComponent<QuestPickup>();
+        pickup.flagId = flagId;
+        pickup.displayName = "血袋";
+        geo.Box(host.transform, "PropBag", Vector3.zero, new Vector3(0.18f, 0.22f, 0.08f), mats.blood, Vector2.one, false, false);
+    }
+
+    void TurnIn(string title, string requires, string doneFlag, string reward, string lockedHint, string doneToast, Vector3 position)
+    {
+        GameObject host = new GameObject("TurnIn");
+        host.transform.SetParent(level, false);
+        host.transform.position = position;
+        BoxCollider box = host.AddComponent<BoxCollider>();
+        box.size = new Vector3(0.7f, 0.45f, 0.5f);
+        TurnInStation station = host.AddComponent<TurnInStation>();
+        station.title = title;
+        station.requires = requires;
+        station.doneFlag = doneFlag;
+        station.reward = reward;
+        station.lockedHint = lockedHint;
+        station.doneToast = doneToast;
+        geo.Box(host.transform, "PropCounter", new Vector3(0f, -0.15f, 0f), new Vector3(0.55f, 0.35f, 0.4f), mats.metal, Vector2.one, false, false);
+    }
+
+    void CallButton(string flagId, string label, Vector3 position)
+    {
+        GameObject host = new GameObject("Call_" + flagId);
+        host.transform.SetParent(level, false);
+        host.transform.position = position;
+        BoxCollider box = host.AddComponent<BoxCollider>();
+        box.size = new Vector3(0.28f, 0.28f, 0.2f);
+        FlagSwitch button = host.AddComponent<FlagSwitch>();
+        button.flagId = flagId;
+        button.label = label;
+        button.doneToast = label + "亮了";
+        geo.Box(host.transform, "PropButton", Vector3.zero, new Vector3(0.12f, 0.12f, 0.06f), mats.keyRed, Vector2.one, false, false);
+    }
+
+    void Terminal(string stampId, string requires, string lockedHint, Vector3 position)
+    {
+        GameObject host = new GameObject("Terminal_" + stampId);
+        host.transform.SetParent(level, false);
+        host.transform.position = position;
+        BoxCollider box = host.AddComponent<BoxCollider>();
+        box.size = new Vector3(0.7f, 0.5f, 0.45f);
+        StampTerminal terminal = host.AddComponent<StampTerminal>();
+        terminal.stampId = stampId;
+        terminal.requires = requires;
+        terminal.lockedHint = lockedHint;
+        geo.Box(host.transform, "PropMonitor", new Vector3(0f, 0.05f, 0f), new Vector3(0.42f, 0.28f, 0.08f), mats.metal, Vector2.one, false, false);
+        geo.Box(host.transform, "PropScreen", new Vector3(0f, 0.05f, -0.05f), new Vector3(0.3f, 0.16f, 0.02f), mats.screen, Vector2.one, false, false);
+    }
+
+    void Valve(string token, Vector3 position, Material material)
+    {
+        GameObject host = new GameObject("Valve_" + token);
+        host.transform.SetParent(level, false);
+        host.transform.position = position;
+        BoxCollider box = host.AddComponent<BoxCollider>();
+        box.size = new Vector3(0.4f, 0.45f, 0.4f);
+        SequenceSwitch valve = host.AddComponent<SequenceSwitch>();
+        valve.groupId = "valve";
+        valve.token = token;
+        geo.Cylinder(host.transform, "PropWheel", Vector3.zero, 0.12f, 0.08f, Quaternion.Euler(90f, 0f, 0f), material, false);
+        geo.Cylinder(host.transform, "PropStem", new Vector3(0f, -0.2f, 0f), 0.04f, 0.35f, Quaternion.identity, mats.metal, false);
+    }
+
+    void Drawer(string label, bool correct, Vector3 position)
+    {
+        GameObject host = new GameObject("Drawer_" + label);
+        host.transform.SetParent(level, false);
+        host.transform.position = position;
+        BoxCollider box = host.AddComponent<BoxCollider>();
+        box.size = new Vector3(0.7f, 0.45f, 0.55f);
+        MorgueDrawer drawer = host.AddComponent<MorgueDrawer>();
+        drawer.label = label;
+        drawer.correct = correct;
+        geo.Box(host.transform, "PropDrawer", Vector3.zero, new Vector3(0.62f, 0.38f, 0.48f), mats.metal, Vector2.one, false, false);
+        Sign(label, position + new Vector3(0f, 0.42f, -0.26f), Vector3.forward, 0.55f, 28, Color.white);
+    }
+
+    void Printer(Vector3 position)
+    {
+        GameObject host = new GameObject("Printer");
+        host.transform.SetParent(level, false);
+        host.transform.position = position;
+        BoxCollider box = host.AddComponent<BoxCollider>();
+        box.size = new Vector3(0.55f, 0.4f, 0.45f);
+        host.AddComponent<EvacPrinter>();
+        geo.Box(host.transform, "PropPrinter", Vector3.zero, new Vector3(0.42f, 0.28f, 0.36f), mats.metal, Vector2.one, false, false);
+        geo.Box(host.transform, "PropTray", new Vector3(0f, 0.02f, -0.2f), new Vector3(0.28f, 0.02f, 0.12f), mats.paper, Vector2.one, false, false);
     }
 }

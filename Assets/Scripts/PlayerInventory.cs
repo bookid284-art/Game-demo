@@ -12,6 +12,23 @@ public class PlayerInventory : MonoBehaviour
 
     public event Action Changed;
 
+    public static PlayerInventory Find(PlayerInteractor interactor)
+    {
+        if (interactor != null && interactor.inventory != null)
+            return interactor.inventory;
+        if (interactor != null)
+        {
+            PlayerInventory onActor = interactor.GetComponent<PlayerInventory>();
+            if (onActor != null)
+                return onActor;
+        }
+        if (GameManager.Instance != null && GameManager.Instance.inventory != null)
+            return GameManager.Instance.inventory;
+        if (GameManager.Instance != null && GameManager.Instance.player != null)
+            return GameManager.Instance.player.GetComponent<PlayerInventory>();
+        return null;
+    }
+
     public bool HasKey(string keyId)
     {
         return !string.IsNullOrEmpty(keyId) && keys.ContainsKey(keyId);
