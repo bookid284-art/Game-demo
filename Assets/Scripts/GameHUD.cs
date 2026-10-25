@@ -252,7 +252,7 @@ public class GameHUD : MonoBehaviour
             new Color(0.85f, 0.88f, 0.9f));
         staminaFill = Bar(canvasGo.transform, "Stamina", sprite, new Vector2(-48f, -136f), new Color(0.65f, 0.82f, 0.95f));
 
-        crosshair = Image(canvasGo.transform, "Crosshair", sprite, new Color(1f, 1f, 1f, 0.85f));
+        crosshair = MakeImage(canvasGo.transform, "Crosshair", sprite, new Color(1f, 1f, 1f, 0.85f));
         RectTransform crossRect = crosshair.rectTransform;
         crossRect.anchorMin = crossRect.anchorMax = new Vector2(0.5f, 0.5f);
         crossRect.sizeDelta = new Vector2(6f, 6f);
@@ -361,7 +361,7 @@ public class GameHUD : MonoBehaviour
 
     Image Bar(Transform parent, string name, Sprite sprite, Vector2 anchored, Color color)
     {
-        Image background = Image(parent, name + "Back", sprite, new Color(0f, 0f, 0f, 0.45f));
+        Image background = MakeImage(parent, name + "Back", sprite, new Color(0f, 0f, 0f, 0.45f));
         RectTransform backRect = background.rectTransform;
         backRect.anchorMin = backRect.anchorMax = new Vector2(1f, 1f);
         backRect.pivot = new Vector2(1f, 1f);
@@ -369,7 +369,7 @@ public class GameHUD : MonoBehaviour
         backRect.anchoredPosition = anchored;
         background.raycastTarget = false;
 
-        Image fill = Image(background.transform, name + "Fill", sprite, color);
+        Image fill = MakeImage(background.transform, name + "Fill", sprite, color);
         RectTransform fillRect = fill.rectTransform;
         fillRect.anchorMin = Vector2.zero;
         fillRect.anchorMax = Vector2.one;
@@ -384,7 +384,7 @@ public class GameHUD : MonoBehaviour
 
     GameObject Panel(Transform parent, string name, Sprite sprite, Color color, Vector2 size)
     {
-        Image image = Image(parent, name, sprite, color);
+        Image image = MakeImage(parent, name, sprite, color);
         RectTransform rect = image.rectTransform;
         rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
         rect.sizeDelta = size;
@@ -394,7 +394,7 @@ public class GameHUD : MonoBehaviour
 
     void MakeButton(Transform parent, string caption, Vector2 anchored, UnityEngine.Events.UnityAction action)
     {
-        Image image = Image(parent, caption, WhiteSprite(), new Color(0.18f, 0.16f, 0.15f, 1f));
+        Image image = MakeImage(parent, caption, WhiteSprite(), new Color(0.18f, 0.16f, 0.15f, 1f));
         RectTransform rect = image.rectTransform;
         rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
         rect.sizeDelta = new Vector2(240f, 48f);
@@ -411,12 +411,12 @@ public class GameHUD : MonoBehaviour
 
     Image FullImage(Transform parent, string name, Sprite sprite, Color color)
     {
-        Image image = Image(parent, name, sprite, color);
+        Image image = MakeImage(parent, name, sprite, color);
         Stretch(image.rectTransform);
         return image;
     }
 
-    Image Image(Transform parent, string name, Sprite sprite, Color color)
+    Image MakeImage(Transform parent, string name, Sprite sprite, Color color)
     {
         GameObject go = new GameObject(name);
         go.transform.SetParent(parent, false);
