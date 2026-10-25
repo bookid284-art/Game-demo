@@ -252,7 +252,11 @@ public class GameManager : MonoBehaviour
 
         codeBuffer = "";
         if (GameHUD.Instance != null)
+        {
+            if (activePad != null)
+                GameHUD.Instance.ShowCode(activePad.title, codeBuffer);
             GameHUD.Instance.Toast("密码不对");
+        }
         if (GameAudio.Instance != null)
             GameAudio.Instance.PlayLocked();
     }
@@ -335,8 +339,15 @@ public class GameManager : MonoBehaviour
         if (HasFlag(doneFlag))
             return;
         string soFar;
-        if (!sequence.TryGetValue(group, out soFar))
+        if (!sequence.TryGetValue(group, out soFar) || soFar == null)
             soFar = "";
+        if (soFar.IndexOf(token + ",", System.StringComparison.Ordinal) >= 0)
+        {
+            if (GameHUD.Instance != null)
+                GameHUD.Instance.Toast(token + "阀咬住了");
+            return;
+        }
+
         string next = soFar + token + ",";
         if (expected.StartsWith(next))
         {
@@ -416,6 +427,11 @@ public class GameManager : MonoBehaviour
     {
         if (state == RunState.Dead || state == RunState.Won)
             return;
+        if (outerOpen && player != null && player.transform.position.z > 104f)
+        {
+            Win();
+            return;
+        }
         state = RunState.Dead;
         Time.timeScale = 0f;
         UnlockCursor();

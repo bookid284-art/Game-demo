@@ -17,8 +17,11 @@ public class BatteryPickup : MonoBehaviour, IInteractable
         FlashlightController light = interactor != null
             ? interactor.GetComponent<FlashlightController>()
             : null;
-        if (light != null)
-            light.AddBattery(amount);
+        if (light == null && GameManager.Instance != null && GameManager.Instance.player != null)
+            light = GameManager.Instance.player.GetComponent<FlashlightController>();
+        if (light == null)
+            return;
+        light.AddBattery(amount);
         if (GameHUD.Instance != null)
             GameHUD.Instance.Toast("电池补充了");
         if (GameAudio.Instance != null)

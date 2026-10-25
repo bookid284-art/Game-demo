@@ -27,8 +27,9 @@ public class QuestPickup : MonoBehaviour, IInteractable
 
     public void Interact(PlayerInteractor interactor)
     {
-        if (GameManager.Instance != null)
-            GameManager.Instance.SetFlag(flagId);
+        if (GameManager.Instance == null)
+            return;
+        GameManager.Instance.SetFlag(flagId);
         if (GameHUD.Instance != null)
             GameHUD.Instance.Toast("拿到" + displayName);
         if (GameAudio.Instance != null)

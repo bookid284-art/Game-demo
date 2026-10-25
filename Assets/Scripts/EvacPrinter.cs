@@ -31,9 +31,12 @@ public class EvacPrinter : MonoBehaviour, IInteractable
             return;
         }
 
+        PlayerInventory inventory = PlayerInventory.Find(interactor);
+        if (inventory == null)
+            return;
+
         printed = true;
-        if (interactor != null && interactor.inventory != null)
-            interactor.inventory.AddKey("auth", "疏散单");
+        inventory.AddKey("auth", "疏散单");
         GameManager.Instance.SetFlag("auth");
         GameManager.Instance.HoldObjectiveToast();
         GameManager.Instance.ReleaseMonster();

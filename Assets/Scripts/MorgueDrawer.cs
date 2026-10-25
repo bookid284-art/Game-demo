@@ -33,9 +33,12 @@ public class MorgueDrawer : MonoBehaviour, IInteractable
             return;
         }
 
+        PlayerInventory inventory = PlayerInventory.Find(interactor);
+        if (inventory == null)
+            return;
+
         emptied = true;
-        if (interactor != null && interactor.inventory != null)
-            interactor.inventory.AddKey("quiet", "安静室钥匙");
+        inventory.AddKey("quiet", "安静室钥匙");
         if (GameManager.Instance != null)
         {
             GameManager.Instance.NotifyKeyCollected("quiet");

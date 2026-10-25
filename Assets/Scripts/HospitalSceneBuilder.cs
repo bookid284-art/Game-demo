@@ -253,7 +253,8 @@ public class HospitalSceneBuilder : MonoBehaviour
         Window(new Vector3(-3.6f, 1.7f, 0.14f));
         Window(new Vector3(3.6f, 1.7f, 0.14f));
         Toilet(new Vector3(10.6f, 0f, 4.2f));
-        Ambulance(new Vector3(-3.3f, 0f, 80.2f));
+        // 车身在 z=78 的东西通道北侧，避免挡住手术室和精神科。
+        Ambulance(new Vector3(-3.3f, 0f, 81.5f));
         geo.Cylinder(level, "PropPipe", new Vector3(-1.55f, 2.95f, 55f), 0.05f, 30f, Quaternion.Euler(90f, 0f, 0f), mats.metal, false);
         geo.Quad(level, "PropBlood", new Vector3(-7.5f, 0.025f, 64.6f), new Vector2(1.2f, 0.75f), Quaternion.Euler(90f, 25f, 0f), mats.blood, false);
         geo.Quad(level, "PropBlood", new Vector3(8.2f, 0.025f, 66.4f), new Vector2(1.4f, 0.9f), Quaternion.Euler(90f, -15f, 0f), mats.blood, false);
@@ -334,7 +335,7 @@ public class HospitalSceneBuilder : MonoBehaviour
         DoorOnZWall("Door_Ward", "ward", 0f, 38f, 1.6f, 2.3f, 100f, "exam", "需要诊室钥匙", preWard, postWard);
         BuildGate(preGate, bay);
 
-        Key("storage", "库房钥匙", new Vector3(-11.15f, 1.35f, 6.5f), mats.brass);
+        Key("storage", "库房钥匙", new Vector3(-10.9f, 1.35f, 6.5f), mats.brass);
         Key("exam", "诊室钥匙", new Vector3(12.3f, 1.08f, 31.1f), mats.steel);
         Key("exit", "装卸区钥匙", new Vector3(-7.8f, 0.92f, 64.65f), mats.keyRed);
         Battery(new Vector3(-1.7f, 1.28f, 9.2f), 0.45f);
@@ -1364,10 +1365,11 @@ public class HospitalSceneBuilder : MonoBehaviour
         int road = Nav("road", 0f, 104f);
         graph.AddLink(bay, yard, false);
         graph.AddLink(yard, road, true);
+        // 围栏打开后也不把这条边交给怪物，它停在围栏内侧。
         BuildSlideGate("FenceGate", "outer", 0f, 84f, "auth",
             "北围栏锁着，要行政室打印的疏散单",
             "围栏开了，往北跑",
-            bay, yard);
+            -1, -1);
     }
 
     void BuildCampaignStory()
