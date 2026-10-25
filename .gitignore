@@ -1,0 +1,46 @@
+# Unity generated
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+.utmp/
+
+# Editor-time generated textures (runtime rebuilds these)
+/[Aa]ssets/[Aa]rt/[Gg]enerated/
+
+# IDE
+.vs/
+.gradle/
+.idea/
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.DotSettings.user
+
+# OS / crash
+.DS_Store
+Thumbs.db
+sysinfo.txt
+mono_crash.*
+*.apk
+*.aab
+*.unitypackage
+ExportedObj/
+.consulo/
