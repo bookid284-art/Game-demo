@@ -52,7 +52,7 @@ public static class HospitalBatchTest
             TestWalk("打开的北围栏", new Vector3(0f, 0.2f, 80f), new Vector3(0f, 0.2f, 90f), true);
             SetBlockersEnabled(83.5f, 84.5f, true);
 
-            TestRayHits("库房钥匙", new Vector3(-9.2f, 1.35f, 6.5f), new Vector3(-10.9f, 1.35f, 6.5f), "Key_storage");
+            TestRayHits("库房钥匙", new Vector3(-7.8f, 1.35f, 8.7f), new Vector3(-8.68f, 1.35f, 8.7f), "Key_storage");
             TestRayHits("零号观察", NotePosition("零号观察") + new Vector3(0f, 0f, -1.2f), NotePosition("零号观察"), "Note");
             TestRayHits("疏散打印机", new Vector3(-36.5f, 1.05f, 2.45f), new Vector3(-40.6f, 1.05f, 2.45f), "Printer");
             TestOverlaps();
