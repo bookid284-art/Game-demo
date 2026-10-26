@@ -235,7 +235,8 @@ public class HospitalSceneBuilder : MonoBehaviour
     void BuildProps()
     {
         Desk(new Vector3(-2.55f, 0f, 9.05f));
-        Shelf(new Vector3(-11.45f, 0f, 6.5f));
+        // 库房西侧入口原先被柜子挡住，人和墙之间过不去，行政走不通。柜子改靠北墙。
+        Shelf(new Vector3(-9.2f, 0f, 8.7f));
         Counter(new Vector3(-3.6f, 0f, 27.2f));
         Cart(new Vector3(12.3f, 0f, 31.1f));
         geo.Box(level, "PropCabinet", new Vector3(10.4f, 0.45f, 28.6f), new Vector3(0.55f, 0.9f, 0.42f), mats.metal, Vector2.one, true, true);
@@ -335,7 +336,7 @@ public class HospitalSceneBuilder : MonoBehaviour
         DoorOnZWall("Door_Ward", "ward", 0f, 38f, 1.6f, 2.3f, 100f, "exam", "需要诊室钥匙", preWard, postWard);
         BuildGate(preGate, bay);
 
-        Key("storage", "库房钥匙", new Vector3(-10.9f, 1.35f, 6.5f), mats.brass);
+        Key("storage", "库房钥匙", new Vector3(-8.68f, 1.35f, 8.7f), mats.brass);
         Key("exam", "诊室钥匙", new Vector3(12.3f, 1.08f, 31.1f), mats.steel);
         Key("exit", "装卸区钥匙", new Vector3(-7.8f, 0.92f, 64.65f), mats.keyRed);
         Battery(new Vector3(-1.7f, 1.28f, 9.2f), 0.45f);
