@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public PlayerInventory inventory;
-    public BasicFirstPersonController player;
+    public ThirdPersonController player;
     public MonsterWatcherAI monster;
     public bool nurseDoorOpen;
     public bool wardDoorOpen;
@@ -149,7 +149,16 @@ public class GameManager : MonoBehaviour
             float distance = monster.DistanceToPlayer;
             float heart = 0f;
             if (monster.IsHunting && !monster.IsFrozen && distance < 12f)
+            {
                 heart = Mathf.Clamp01(1f - distance / 12f);
+                if (player != null)
+                {
+                    Vector3 flat = monster.transform.position - player.transform.position;
+                    flat.y = 0f;
+                    if (flat.sqrMagnitude > 0.04f && Vector3.Dot(player.transform.forward, flat.normalized) < 0.15f)
+                        heart = Mathf.Clamp01(heart + 0.22f);
+                }
+            }
             GameAudio.Instance.SetHeartbeat(heart);
         }
     }

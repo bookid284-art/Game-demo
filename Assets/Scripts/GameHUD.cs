@@ -9,7 +9,7 @@ public class GameHUD : MonoBehaviour
     public static GameHUD Instance { get; private set; }
 
     public MonsterWatcherAI monster;
-    public BasicFirstPersonController player;
+    public ThirdPersonController player;
     public FlashlightController flashlight;
     public PlayerInventory inventory;
     public PlayerInteractor interactor;
@@ -25,7 +25,7 @@ public class GameHUD : MonoBehaviour
     Text staminaLabel;
     Image batteryFill;
     Image staminaFill;
-    Image crosshair;
+    Image[] aimTicks;
     Image vignette;
     GameObject noteRoot;
     Text noteTitle;
@@ -51,6 +51,40 @@ public class GameHUD : MonoBehaviour
         tex.SetPixels(pixels);
         tex.Apply();
         return Sprite.Create(tex, new Rect(0f, 0f, 2f, 2f), new Vector2(0.5f, 0.5f), 100f);
+    }
+
+    static Sprite VignetteSprite()
+    {
+        const int size = 128;
+        Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        tex.wrapMode = TextureWrapMode.Clamp;
+        Color[] pixels = new Color[size * size];
+        float half = (size - 1) * 0.5f;
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float dx = (x - half) / half;
+                float dy = (y - half) / half;
+                float radius = Mathf.Sqrt(dx * dx + dy * dy);
+                float alpha = Mathf.SmoothStep(0.28f, 1.08f, radius);
+                pixels[y * size + x] = new Color(1f, 1f, 1f, alpha);
+            }
+        }
+        tex.SetPixels(pixels);
+        tex.Apply();
+        return Sprite.Create(tex, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), 100f);
+    }
+
+    Image AimTick(Transform parent, Sprite sprite, Vector2 anchored, Vector2 size)
+    {
+        Image image = MakeImage(parent, "Aim", sprite, new Color(0.82f, 0.86f, 0.88f, 0.42f));
+        RectTransform rect = image.rectTransform;
+        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.sizeDelta = size;
+        rect.anchoredPosition = anchored;
+        image.raycastTarget = false;
+        return image;
     }
 
     void Awake()
@@ -87,24 +121,67 @@ public class GameHUD : MonoBehaviour
         if (promptText != null)
             promptText.text = prompt ?? string.Empty;
 
-        bool showWatch = monster != null && monster.IsFrozen && monster.DistanceToPlayer < 22f
-            && GameManager.Instance != null && GameManager.Instance.State == GameManager.RunState.Playing;
+        bool playingWatch = GameManager.Instance != null && GameManager.Instance.State == GameManager.RunState.Playing;
+        bool showFrozen = monster != null && monster.IsFrozen && monster.DistanceToPlayer < 22f && playingWatch;
+        bool showEdge = monster != null && !monster.IsFrozen && monster.IsInFrame && monster.IsHunting
+            && monster.DistanceToPlayer < 7.5f && playingWatch;
         if (watchText != null)
-            watchText.gameObject.SetActive(showWatch);
-
-        if (crosshair != null)
-            crosshair.color = string.IsNullOrEmpty(prompt)
-                ? new Color(1f, 1f, 1f, 0.85f)
-                : new Color(1f, 0.78f, 0.35f, 1f);
-
-        if (vignette != null && monster != null)
         {
-            float near = Mathf.Clamp01(1f - monster.DistanceToPlayer / 8f);
-            if (monster.IsFrozen)
-                near *= 0.35f;
-            if (!monster.IsHunting)
-                near *= 0.25f;
-            vignette.color = new Color(0.55f, 0.05f, 0.04f, near * 0.75f);
+            watchText.gameObject.SetActive(showFrozen || showEdge);
+            if (showFrozen)
+            {
+                watchText.text = "把它留在画面中央";
+                watchText.color = new Color(0.9f, 0.25f, 0.2f);
+            }
+            else if (showEdge)
+            {
+                watchText.text = "还没到画面中央";
+                watchText.color = new Color(0.95f, 0.72f, 0.35f);
+            }
+        }
+
+        if (aimTicks != null)
+        {
+            Color aim = string.IsNullOrEmpty(prompt)
+                ? new Color(0.82f, 0.86f, 0.88f, 0.42f)
+                : new Color(1f, 0.78f, 0.35f, 0.92f);
+            Vector2 viewport = interactor != null ? interactor.AimViewport : new Vector2(0.5f, 0.5f);
+            for (int i = 0; i < aimTicks.Length; i++)
+            {
+                if (aimTicks[i] == null)
+                    continue;
+                aimTicks[i].color = aim;
+                aimTicks[i].rectTransform.anchorMin = viewport;
+                aimTicks[i].rectTransform.anchorMax = viewport;
+            }
+        }
+
+        if (vignette != null)
+        {
+            Color wash = new Color(0.012f, 0.02f, 0.026f, 0.84f);
+            bool showThreat = GameManager.Instance != null
+                && GameManager.Instance.State != GameManager.RunState.Intro
+                && GameManager.Instance.State != GameManager.RunState.Won;
+            if (monster != null && showThreat)
+            {
+                float near = Mathf.Clamp01(1f - monster.DistanceToPlayer / 9f);
+                bool behind = false;
+                if (player != null)
+                {
+                    Vector3 flat = monster.transform.position - player.transform.position;
+                    flat.y = 0f;
+                    if (flat.sqrMagnitude > 0.04f)
+                        behind = Vector3.Dot(player.transform.forward, flat.normalized) < 0.2f;
+                }
+                if (monster.IsHunting && !monster.IsFrozen)
+                {
+                    float blood = near * (behind ? 1f : 0.48f);
+                    wash = Color.Lerp(wash, new Color(0.46f, 0.02f, 0.03f, 0.94f), blood);
+                }
+                else if (monster.IsFrozen)
+                    wash = Color.Lerp(wash, new Color(0.22f, 0.03f, 0.03f, 0.72f), near * 0.28f);
+            }
+            vignette.color = wash;
         }
 
         if (toastTimer > 0f)
@@ -230,7 +307,7 @@ public class GameHUD : MonoBehaviour
         scaler.matchWidthOrHeight = 0.5f;
         canvasGo.AddComponent<GraphicRaycaster>();
 
-        vignette = FullImage(canvasGo.transform, "Vignette", sprite, new Color(0.4f, 0f, 0f, 0f));
+        vignette = FullImage(canvasGo.transform, "Vignette", VignetteSprite(), new Color(0.012f, 0.02f, 0.026f, 0.84f));
         vignette.raycastTarget = false;
 
         objectiveText = Label(canvasGo.transform, "Objective", "目标", 24, TextAnchor.UpperLeft,
@@ -252,15 +329,14 @@ public class GameHUD : MonoBehaviour
             new Color(0.85f, 0.88f, 0.9f));
         staminaFill = Bar(canvasGo.transform, "Stamina", sprite, new Vector2(-48f, -136f), new Color(0.65f, 0.82f, 0.95f));
 
-        crosshair = MakeImage(canvasGo.transform, "Crosshair", sprite, new Color(1f, 1f, 1f, 0.85f));
-        RectTransform crossRect = crosshair.rectTransform;
-        crossRect.anchorMin = crossRect.anchorMax = new Vector2(0.5f, 0.5f);
-        crossRect.sizeDelta = new Vector2(6f, 6f);
-        crossRect.anchoredPosition = Vector2.zero;
-        crosshair.raycastTarget = false;
+        aimTicks = new Image[4];
+        aimTicks[0] = AimTick(canvasGo.transform, sprite, new Vector2(12f, 0f), new Vector2(11f, 2f));
+        aimTicks[1] = AimTick(canvasGo.transform, sprite, new Vector2(-12f, 0f), new Vector2(11f, 2f));
+        aimTicks[2] = AimTick(canvasGo.transform, sprite, new Vector2(0f, 12f), new Vector2(2f, 11f));
+        aimTicks[3] = AimTick(canvasGo.transform, sprite, new Vector2(0f, -12f), new Vector2(2f, 11f));
 
-        watchText = Label(canvasGo.transform, "Watch", "不要移开视线", 30, TextAnchor.MiddleCenter,
-            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 70f), new Vector2(600f, 48f),
+        watchText = Label(canvasGo.transform, "Watch", "把它留在画面中央", 30, TextAnchor.MiddleCenter,
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 196f), new Vector2(640f, 48f),
             new Color(0.9f, 0.25f, 0.2f));
         watchText.gameObject.SetActive(false);
 
@@ -270,7 +346,7 @@ public class GameHUD : MonoBehaviour
         toastText = Label(canvasGo.transform, "Toast", "", 26, TextAnchor.MiddleCenter,
             new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 210f), new Vector2(1100f, 44f),
             new Color(0.95f, 0.93f, 0.88f, 0f));
-        hintText = Label(canvasGo.transform, "Hint", "WASD 移动    Shift 冲刺    E 交互    F 手电筒    J 夜班记录    Esc 暂停",
+        hintText = Label(canvasGo.transform, "Hint", "WASD 移动    鼠标转身    Shift 冲刺    E 交互    F 手电筒    J 夜班记录    Esc 暂停",
             20, TextAnchor.LowerCenter, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 28f),
             new Vector2(1400f, 32f), new Color(0.8f, 0.8f, 0.8f, 0.75f));
 
@@ -317,7 +393,7 @@ public class GameHUD : MonoBehaviour
         Label(introRoot.transform, "Title", "夜班医院", 72, TextAnchor.MiddleCenter,
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 40f), new Vector2(800f, 100f),
             new Color(0.93f, 0.9f, 0.82f));
-        Label(introRoot.transform, "Sub", "四个章，然后跑", 32, TextAnchor.MiddleCenter,
+        Label(introRoot.transform, "Sub", "镜头在身后。四个章，然后跑", 32, TextAnchor.MiddleCenter,
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -40f), new Vector2(600f, 48f),
             new Color(0.75f, 0.28f, 0.22f));
 
@@ -333,8 +409,8 @@ public class GameHUD : MonoBehaviour
         Label(deathRoot.transform, "Title", "它抓住了你", 46, TextAnchor.UpperCenter,
             new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -40f), new Vector2(560f, 70f),
             new Color(0.9f, 0.3f, 0.25f));
-        Label(deathRoot.transform, "Sub", "视线离开的时候，它在动。按 R 再试一次。", 24, TextAnchor.MiddleCenter,
-            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 10f), new Vector2(560f, 60f),
+        Label(deathRoot.transform, "Sub", "它不在画面中央时会靠近。按 R 再试一次。", 24, TextAnchor.MiddleCenter,
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 10f), new Vector2(600f, 60f),
             new Color(0.92f, 0.88f, 0.84f));
         MakeButton(deathRoot.transform, "再试一次", new Vector2(0f, -80f), delegate { GameManager.Instance.Restart(); });
         deathRoot.SetActive(false);
