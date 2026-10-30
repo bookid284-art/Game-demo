@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 病人零号。出现在玩家视野里并且没有被墙挡住时会停住，否则追击。
+/// 病人零号。夜班护士正对着它、它留在画面里、而且中间没有墙时会停住。
 /// </summary>
 [RequireComponent(typeof(CharacterController))]
 public class MonsterWatcherAI : MonoBehaviour
 {
     public Transform player;
     public Camera playerCamera;
+    public Light eyeLight;
     public HospitalNavGraph graph;
     public Transform armL;
     public Transform armR;
@@ -38,6 +39,8 @@ public class MonsterWatcherAI : MonoBehaviour
     {
         get { return frozen; }
     }
+
+    public bool IsInFrame { get; private set; }
 
     public bool IsHunting
     {
@@ -248,27 +251,50 @@ public class MonsterWatcherAI : MonoBehaviour
 
     bool IsObserved()
     {
-        if (playerCamera == null)
+        IsInFrame = false;
+        if (playerCamera == null || player == null)
+            return false;
+
+        ThirdPersonController motor = player.GetComponent<ThirdPersonController>();
+        Vector3 eye = motor != null ? motor.EyePosition : player.position + Vector3.up * 1.52f;
+        Vector3 look = motor != null ? motor.LookDirection : playerCamera.transform.forward;
+        if (look.sqrMagnitude < 0.001f)
             return false;
 
         Vector3[] points =
         {
-            transform.position + Vector3.up * 1.72f,
-            transform.position + Vector3.up * 1.25f,
-            transform.position + Vector3.up * 0.7f
+            transform.position + Vector3.up * 1.82f,
+            transform.position + Vector3.up * 1.28f,
+            transform.position + Vector3.up * 0.72f
         };
 
+        // 35° 接近原来第一人称 68° 视野的一半。肩后看得到的黑暗不算看住。
+        const float gazeHalfAngle = 35f;
+        bool gazed = false;
         for (int i = 0; i < points.Length; i++)
         {
+            Vector3 to = points[i] - eye;
+            float length = to.magnitude;
+            if (length < 0.2f)
+                continue;
             Vector3 viewport = playerCamera.WorldToViewportPoint(points[i]);
-            if (viewport.z < 0.25f)
+            bool inGaze = Vector3.Angle(look, to / length) <= gazeHalfAngle
+                && viewport.z > 0.2f
+                && viewport.x > -0.06f && viewport.x < 1.06f
+                && viewport.y > -0.08f && viewport.y < 1.08f;
+            bool onScreen = viewport.z > 0.25f
+                && viewport.x > 0.03f && viewport.x < 0.97f
+                && viewport.y > 0.04f && viewport.y < 0.96f;
+            if (!inGaze && !onScreen)
                 continue;
-            if (viewport.x < 0.025f || viewport.x > 0.975f || viewport.y < 0.025f || viewport.y > 0.975f)
+            if (!ClearSight(eye, points[i]))
                 continue;
-            if (ClearSight(playerCamera.transform.position, points[i]))
-                return true;
+            if (onScreen)
+                IsInFrame = true;
+            if (inGaze)
+                gazed = true;
         }
-        return false;
+        return gazed;
     }
 
     bool HasLineOfSightToPlayer()
@@ -311,7 +337,7 @@ public class MonsterWatcherAI : MonoBehaviour
             Collider collider = Hits[i].collider;
             if (collider == null)
                 continue;
-            if (collider.GetComponentInParent<BasicFirstPersonController>() != null)
+            if (collider.GetComponentInParent<ThirdPersonController>() != null)
                 continue;
             if (collider.GetComponentInParent<MonsterWatcherAI>() != null)
                 return true;
@@ -339,7 +365,7 @@ public class MonsterWatcherAI : MonoBehaviour
         RaycastHit hit;
         if (!Physics.Raycast(origin, direction, out hit, distance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
             return false;
-        if (hit.collider.GetComponentInParent<BasicFirstPersonController>() != null)
+        if (hit.collider.GetComponentInParent<ThirdPersonController>() != null)
             return false;
         if (hit.collider.GetComponentInParent<MonsterWatcherAI>() != null)
             return false;
@@ -375,14 +401,17 @@ public class MonsterWatcherAI : MonoBehaviour
     void Animate(bool moving)
     {
         float swing = moving ? Mathf.Sin(Time.time * (hunting ? 8f : 3.2f)) * (hunting ? 32f : 16f) : 0f;
+        // 负 X 让手臂朝角色前方伸。停在画面里时它朝护士伸手，手臂没有碰撞，不会改变追上的距离。
+        float reach = frozen ? 34f : 0f;
         if (armL != null)
-            armL.localRotation = Quaternion.Euler(swing, 0f, 6f);
+            armL.localRotation = Quaternion.Euler(-reach + swing, 0f, 6f);
         if (armR != null)
-            armR.localRotation = Quaternion.Euler(-swing, 0f, -6f);
+            armR.localRotation = Quaternion.Euler(-reach - swing, 0f, -6f);
         if (head != null)
         {
             float tilt = frozen ? Mathf.Sin(Time.time * 1.4f) * 4f : Mathf.Sin(Time.time * 6f) * 3f;
-            head.localRotation = Quaternion.Euler(8f + tilt, 0f, 0f);
+            float crane = frozen ? 16f : 8f;
+            head.localRotation = Quaternion.Euler(crane + tilt, 0f, 0f);
         }
     }
 
@@ -396,12 +425,18 @@ public class MonsterWatcherAI : MonoBehaviour
 
     void UpdateEyes()
     {
-        if (eyeMaterial == null)
-            return;
         float pulse = 1.4f + Mathf.Sin(Time.time * (frozen ? 2f : 7f)) * (frozen ? 0.2f : 0.7f);
         if (!frozen && hunting)
             pulse += 1.2f;
-        eyeMaterial.SetColor("_EmissionColor", new Color(0.85f, 0.04f, 0.02f) * pulse);
+        if (eyeMaterial != null)
+            eyeMaterial.SetColor("_EmissionColor", new Color(0.85f, 0.04f, 0.02f) * pulse);
+        if (eyeLight != null)
+        {
+            // 在追的时候眼睛更亮，方便从她肩后看见亮点；被看住时压暗。
+            float glow = frozen ? 0.25f : (hunting ? 1.35f : 0.45f);
+            eyeLight.intensity = glow * (0.85f + Mathf.Sin(Time.time * (frozen ? 2f : 7f)) * 0.15f);
+            eyeLight.range = frozen ? 1.8f : 3.6f;
+        }
     }
 
     float HorizontalDistance(Vector3 world)
