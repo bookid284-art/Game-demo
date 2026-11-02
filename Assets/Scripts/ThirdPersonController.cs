@@ -288,21 +288,35 @@ public class ThirdPersonController : MonoBehaviour
         if (IsSprinting)
             desired += 0.08f;
 
+        float breathe = Mathf.Sin(Time.time * (1.15f + fear)) * (0.01f + fear * 0.012f);
+        float drop = intro ? -0.18f : (monster != null && monster.IsFrozen ? 0.05f * fear : -0.06f * fear);
+        // Start inside the player's collision clearance, not at a shoulder
+        // offset which may already be embedded in a wall. Include animation
+        // offsets before collision checks so they cannot push the camera back in.
+        Vector3 origin = transform.TransformPoint(new Vector3(0f, pivotBase.y + drop, 0f));
+        Vector3 desiredPivot = transform.TransformPoint(pivotBase + Vector3.up * drop)
+            + cameraPivot.up * (breathe - recoil);
+        Vector3 offset = desiredPivot - origin;
+        float offsetLength = offset.magnitude;
+        cameraPivot.position = offsetLength > 0.0001f
+            ? origin + offset / offsetLength * ResolveDistance(origin, offset / offsetLength, offsetLength)
+            : origin;
+
         Vector3 back = -cameraPivot.forward;
         float allowed = ResolveDistance(cameraPivot.position, back, desired);
         float dt = dead ? Time.unscaledDeltaTime : Time.deltaTime;
         float blend = 1f - Mathf.Exp(-8f * Mathf.Max(dt, 0f));
-        currentDistance = Mathf.Lerp(currentDistance, allowed, blend);
+        // Collision limits apply this frame, even when the game is paused.
+        // Only recovery away from an obstruction may be smoothed.
+        currentDistance = allowed < currentDistance
+            ? allowed
+            : Mathf.Lerp(currentDistance, allowed, blend);
 
-        float breathe = Mathf.Sin(Time.time * (1.15f + fear)) * (0.01f + fear * 0.012f);
-        cameraHolder.localPosition = new Vector3(0f, breathe - recoil, -currentDistance);
+        cameraHolder.localPosition = new Vector3(0f, 0f, -currentDistance);
         cameraHolder.localRotation = Quaternion.identity;
 
         if (view != null)
             view.fieldOfView = Mathf.Lerp(view.fieldOfView, 66f, blend);
-
-        float drop = intro ? -0.18f : (monster != null && monster.IsFrozen ? 0.05f * fear : -0.06f * fear);
-        cameraPivot.localPosition = pivotBase + new Vector3(0f, drop, 0f);
     }
 
     float ResolveDistance(Vector3 pivot, Vector3 back, float desired)
@@ -324,15 +338,16 @@ public class ThirdPersonController : MonoBehaviour
             if (CameraHits[i].distance < nearest)
                 nearest = CameraHits[i].distance;
         }
-        const float floorDistance = 0.3f;
         if (nearest < float.MaxValue)
-            allowed = Mathf.Clamp(nearest - 0.05f, floorDistance, desired);
+            allowed = Mathf.Clamp(nearest - 0.05f, 0f, desired);
 
-        for (int step = 0; step < 12; step++)
+        // A cosmetic minimum distance must not override collision clearance.
+        // Both the shoulder offset and boom may retract all the way to origin.
+        while (allowed > 0f)
         {
             if (!PointBlocked(pivot + back * allowed))
                 break;
-            allowed = Mathf.Max(floorDistance, allowed - 0.08f);
+            allowed = Mathf.Max(0f, allowed - 0.08f);
         }
         return allowed;
     }
@@ -389,3 +404,4 @@ public class ThirdPersonController : MonoBehaviour
         breath.pitch = Mathf.Lerp(0.96f, 1.06f, fear);
     }
 }
+
