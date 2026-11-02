@@ -60,13 +60,28 @@ Press J for the checklist. Side tasks (Lin Xia's notes, pharmacy inventory, unfi
 - ProjectSettings/: Unity project configuration
 
 ## Notes
-- This project is a prototype and currently has no automated tests.
+- This project is a prototype. Batch-mode regression checks are described below.
 - The AI and interaction systems are intentionally simple and suitable for extension.
 - Optional material slots on HospitalSceneBuilder (`wallMaterial`, `floorMaterial`, `ceilingMaterial`, `doorMaterial`) replace the generated textures. Free Asset Store materials can be assigned there before generating the level.
 - Keep the project on the Built-in Render Pipeline. The generated materials use the Standard shader.
+
+## Regression checks
+Run these commands from the project directory with Unity 2022.3 LTS (`Unity` means the full path to your Unity Editor executable). Use a separate batch-mode editor process with the project closed in the GUI:
+
+```sh
+Unity -batchmode -nographics -projectPath . -executeMethod HospitalAIRegressionTest.Run -logFile ai-regression.log
+Unity -batchmode -nographics -projectPath . -executeMethod HospitalBatchTest.Run -logFile hospital-regression.log
+```
+
+`HospitalAIRegressionTest` exercises the production AI routing methods in an isolated scene: long corridors at 15/30/60/144 FPS and three speeds, patrol routing through room exits, changed goals at junctions, closed doors, and wall-blocked catches using Unity Physics. It exits with code 0 on success or 2 on failure. Movement in the routing cases is simulated; it does not replace a Play Mode test of CharacterController collision and steering.
+
+`HospitalBatchTest` builds the full hospital and checks geometry, navigation, and progression. Its existing report path is `/tmp/hospital-test-result.txt`, so run that suite on macOS/Linux.
+
+The 2026-11-02 review reproduced the waypoint-reset bug in a separate numerical model (12 speed/frame-rate combinations) and checked patrol routing, changed goals, and closed links. Unity was unavailable in the review environment: these Unity suites, C# compilation, rendering, and full-playthrough behavior still need editor verification.
 
 ## Contributing
 Pull requests and issues are welcome. Please include a short description and testing notes when submitting changes.
 
 ## License
 No license is currently specified in the repository. Add a LICENSE file if you want to publish the project under a formal open-source license. The bundled UI font is a subset of WenQuanYi Micro Hei; see Assets/Docs/ThirdPartyNotices.md.
+

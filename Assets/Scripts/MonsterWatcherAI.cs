@@ -132,7 +132,7 @@ public class MonsterWatcherAI : MonoBehaviour
         UpdateVoice(moving);
         UpdateEyes();
 
-        if (hunting && !frozen && DistanceToPlayer < 1.12f && GameManager.Instance != null)
+        if (GameManager.Instance != null && CanCatchPlayer())
             GameManager.Instance.Kill();
 
         moanTimer -= dt;
@@ -204,7 +204,15 @@ public class MonsterWatcherAI : MonoBehaviour
             patrolIndex = (patrolIndex + 1) % patrolNodes.Length;
             point = graph.NodePosition(patrolNodes[patrolIndex]);
         }
-        return point;
+        // Patrol points can be in different rooms; follow the corridor graph
+        // instead of steering straight through the intervening walls.
+        return PathTowardWorld(point);
+    }
+
+    bool CanCatchPlayer()
+    {
+        return player != null && hunting && !frozen && DistanceToPlayer < 1.12f
+            && HasLineOfSightToPlayer();
     }
 
     Vector3 NextPathPoint()
@@ -224,8 +232,17 @@ public class MonsterWatcherAI : MonoBehaviour
         if (path.Count == 0 || replanTimer <= 0f || pathGoal != goal)
         {
             int from = graph.Nearest(transform.position);
-            path = graph.PathToward(from, goal);
-            pathIndex = 0;
+            List<int> nextPath = graph.PathToward(from, goal);
+            // While travelling an edge, the nearest node may still be behind
+            // us. Preserve that edge's progress when replanning; otherwise the
+            // 0.4-second refresh sends us back to its start over and over.
+            // Keep the first node for a different edge so corners aren't cut.
+            bool continuingSegment = pathIndex > 0 && pathIndex < path.Count
+                && nextPath.Count > 1
+                && nextPath[0] == path[pathIndex - 1]
+                && nextPath[1] == path[pathIndex];
+            path = nextPath;
+            pathIndex = continuingSegment ? 1 : 0;
             replanTimer = 0.4f;
             pathGoal = goal;
         }
@@ -411,3 +428,4 @@ public class MonsterWatcherAI : MonoBehaviour
         return delta.magnitude;
     }
 }
+
