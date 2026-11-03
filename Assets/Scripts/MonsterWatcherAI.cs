@@ -135,7 +135,7 @@ public class MonsterWatcherAI : MonoBehaviour
         UpdateVoice(moving);
         UpdateEyes();
 
-        if (hunting && !frozen && DistanceToPlayer < 1.12f && GameManager.Instance != null)
+        if (GameManager.Instance != null && CanCatchPlayer())
             GameManager.Instance.Kill();
 
         moanTimer -= dt;
@@ -207,7 +207,14 @@ public class MonsterWatcherAI : MonoBehaviour
             patrolIndex = (patrolIndex + 1) % patrolNodes.Length;
             point = graph.NodePosition(patrolNodes[patrolIndex]);
         }
-        return point;
+        // 巡逻点可能隔着房间。沿走廊路点走，不要直线穿过中间的墙。
+        return PathTowardWorld(point);
+    }
+
+    bool CanCatchPlayer()
+    {
+        return player != null && hunting && !frozen && DistanceToPlayer < 1.12f
+            && HasLineOfSightToPlayer();
     }
 
     Vector3 NextPathPoint()
@@ -227,8 +234,15 @@ public class MonsterWatcherAI : MonoBehaviour
         if (path.Count == 0 || replanTimer <= 0f || pathGoal != goal)
         {
             int from = graph.Nearest(transform.position);
-            path = graph.PathToward(from, goal);
-            pathIndex = 0;
+            List<int> nextPath = graph.PathToward(from, goal);
+            // 还在同一条边上时，最近点可能仍在身后。保留已经走过的进度，
+            // 否则每 0.4 秒重算都会把目标拉回路点起点。换边时保留第一个点，避免抄近路切角。
+            bool continuingSegment = pathIndex > 0 && pathIndex < path.Count
+                && nextPath.Count > 1
+                && nextPath[0] == path[pathIndex - 1]
+                && nextPath[1] == path[pathIndex];
+            path = nextPath;
+            pathIndex = continuingSegment ? 1 : 0;
             replanTimer = 0.4f;
             pathGoal = goal;
         }
