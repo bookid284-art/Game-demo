@@ -207,7 +207,8 @@ public class MonsterWatcherAI : MonoBehaviour
             patrolIndex = (patrolIndex + 1) % patrolNodes.Length;
             point = graph.NodePosition(patrolNodes[patrolIndex]);
         }
-        // 巡逻点可能隔着房间。沿走廊路点走，不要直线穿过中间的墙。
+        // Patrol points can be in different rooms; follow the corridor graph
+        // instead of steering straight through the intervening walls.
         return PathTowardWorld(point);
     }
 
@@ -235,8 +236,10 @@ public class MonsterWatcherAI : MonoBehaviour
         {
             int from = graph.Nearest(transform.position);
             List<int> nextPath = graph.PathToward(from, goal);
-            // 还在同一条边上时，最近点可能仍在身后。保留已经走过的进度，
-            // 否则每 0.4 秒重算都会把目标拉回路点起点。换边时保留第一个点，避免抄近路切角。
+            // While travelling an edge, the nearest node may still be behind
+            // us. Preserve that edge's progress when replanning; otherwise the
+            // 0.4-second refresh sends us back to its start over and over.
+            // Keep the first node for a different edge so corners aren't cut.
             bool continuingSegment = pathIndex > 0 && pathIndex < path.Count
                 && nextPath.Count > 1
                 && nextPath[0] == path[pathIndex - 1]
@@ -460,3 +463,4 @@ public class MonsterWatcherAI : MonoBehaviour
         return delta.magnitude;
     }
 }
+
