@@ -1,14 +1,14 @@
 # Game-demo
 
 ## Overview
-This repository is a Unity-based first-person horror prototype and graybox demo project. It includes a hospital-style level generator, basic movement and camera control, a collectible key system, locked doors, an escape gate, and a monster AI that reacts to whether the player is looking at it.
+This repository is a Unity-based third-person horror prototype and graybox demo project. It includes a hospital-style level generator, an over-the-shoulder camera that follows the night nurse, a collectible key system, locked doors, an escape gate, and a monster AI that stops only when it is centered in her view.
 
 The playable scene is `Assets/Scenes/Hospital.unity`. Pressing Play generates the hospital at runtime. Geometry is built from Unity primitives in code. Wall, floor, and prop textures are generated in code as well, so the project runs without an Asset Store download.
 
 ## Features
 - HospitalSceneBuilder: builds a hospital-style graybox level using Unity primitives.
-- BasicFirstPersonController: standard WASD movement and mouse-look first-person controller with flashlight support.
-- MonsterWatcherAI: monster chases the player when not seen and stops when the player looks at it.
+- ThirdPersonController: WASD movement and mouse-look, with the camera behind the nurse's right shoulder. The flashlight is in her hand.
+- MonsterWatcherAI: the patient chases until it is in the center of the frame and in her line of sight. The dark space beside her body does not freeze it.
 - Interaction system: key pickup, locked door requiring a key, and escape door logic.
 - Documentation: Assets/Docs/SetupGuide.md includes Chinese setup instructions for the project.
 
@@ -22,13 +22,13 @@ The playable scene is `Assets/Scenes/Hospital.unity`. Pressing Play generates th
 2. Open the project in Unity.
 3. Open `Assets/Scenes/Hospital.unity`.
 4. Press Play. The builder generates the hospital automatically.
-5. Move with WASD and the mouse. Interact with E. Toggle the flashlight with F.
+5. Move with WASD and the mouse. The camera stays behind her and pulls in against walls. Interact with E. Toggle the flashlight with F.
 
 To preview the level in the editor before playing, select the HospitalSceneBuilder object and use the component menu **Build Hospital Graybox**, or use the top menu **Game Demo / Build Hospital Graybox**. Playing again rebuilds the level from code.
 
 ## Controls
 - WASD: move
-- Mouse: look
+- Mouse: turn her, and the camera follows from behind her right shoulder
 - Shift: sprint (uses stamina)
 - E: pick up keys, read notes, open doors
 - F or right mouse: toggle flashlight
@@ -50,7 +50,7 @@ The night is nine steps, aimed at a blind playthrough of about five to six hours
 8. Open the north fence with the slip.
 9. Run past the fence.
 
-Press J for the checklist. Side tasks (Lin Xia's notes, pharmacy inventory, unfinished surgery, morgue tags, handover pages, and the quiet room) change the ending. The figure freezes while it is on screen and not behind a wall. Until the slip is printed, it will not follow you through the loading gate.
+Press J for the checklist. Side tasks (Lin Xia's notes, pharmacy inventory, unfinished surgery, morgue tags, handover pages, and the quiet room) change the ending. The figure freezes while it sits in the center of the frame and a wall is not between her eyes and it. Standing beside her, at the edge of the wider third-person view, is not enough. Until the slip is printed, it will not follow you through the loading gate.
 
 ## Project Structure
 - Assets/Scripts/: gameplay scripts and scene builder logic

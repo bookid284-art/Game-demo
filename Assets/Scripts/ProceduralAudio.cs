@@ -139,6 +139,21 @@ public static class ProceduralAudio
         });
     }
 
+    public static AudioClip Breath()
+    {
+        int samples = Rate * 3;
+        return Make("breath", samples, delegate (int i)
+        {
+            float t = i / (float)Rate;
+            float cycle = t % 3f;
+            float inhale = cycle < 1.25f ? Mathf.Sin(Mathf.Clamp01(cycle / 1.25f) * Mathf.PI) : 0f;
+            float exhale = cycle > 1.45f && cycle < 2.7f
+                ? Mathf.Sin((cycle - 1.45f) / 1.25f * Mathf.PI)
+                : 0f;
+            return Hash(i) * (inhale * 0.28f + exhale * 0.5f);
+        });
+    }
+
     static float Thump(float time, float center)
     {
         float d = time - center;

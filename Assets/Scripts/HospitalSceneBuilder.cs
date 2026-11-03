@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 生成夜班医院灰盒：走廊、病房、钥匙、门锁、逃生门、玩家和凝视怪物。
+/// 生成夜班医院灰盒：走廊、病房、钥匙、门锁、逃生门、第三人称护士和凝视怪物。
 /// 组件菜单或顶部菜单 Game Demo/Build Hospital Graybox 可在编辑器里预览。
 /// </summary>
 [AddComponentMenu("Game Demo/Hospital Scene Builder")]
@@ -88,7 +88,7 @@ public class HospitalSceneBuilder : MonoBehaviour
         root.SetActive(true);
         Physics.SyncTransforms();
         int problems = ValidateNav();
-        Debug.Log("医院灰盒已生成。导航穿墙警告: " + problems + "。WASD 移动，E 交互，F 手电筒。");
+        Debug.Log("医院灰盒已生成。导航穿墙警告: " + problems + "。镜头在护士身后。WASD 移动，E 交互，F 手电筒。");
 
 #if UNITY_EDITOR
         if (!Application.isPlaying)
@@ -273,9 +273,9 @@ public class HospitalSceneBuilder : MonoBehaviour
         Sign("太平间", new Vector3(1.78f, 2.35f, 67f), Vector3.right, 0.9f, 36, new Color(1f, 0.4f, 0.35f));
         Sign("装卸区", new Vector3(0f, 2.75f, 71.7f), Vector3.forward, 1.2f, 48, new Color(0.5f, 1f, 0.65f));
 
-        Note("交接记录", "夜班交接残页 1/5。疏散要四个章：急诊、病房、手术、精神科。东边是急诊，西边是行政。装卸闸门不是出口，北围栏认疏散单。那东西只有被看着的时候才停。手电筒别一直开着。", new Vector3(-3.15f, 1.28f, 9.05f), "page1");
-        Note("护士站备忘", "交接残页 2/5。诊室钥匙在检查床旁边。病房章在护士站终端，301、305、306 的呼叫铃都要亮。听到刮擦声就回头，看住它，再走。", new Vector3(-1.85f, 1.05f, 27.2f), "page2");
-        Note("307 床卡", "装卸区钥匙塞在床垫侧面。它只能开走廊尽头的闸门，开不了北围栏。它昨晚从这张床上站起来。看着它。", new Vector3(-8.9f, 0.95f, 66.7f));
+        Note("交接记录", "夜班交接残页 1/5。疏散要四个章：急诊、病房、手术、精神科。东边是急诊，西边是行政。装卸闸门不是出口，北围栏认疏散单。那东西只有正对、留在画面中央时才停。手电筒别一直开着。", new Vector3(-3.15f, 1.28f, 9.05f), "page1");
+        Note("护士站备忘", "交接残页 2/5。诊室钥匙在检查床旁边。病房章在护士站终端，301、305、306 的呼叫铃都要亮。听到刮擦声就转身，让它停在画面中央，再走。", new Vector3(-1.85f, 1.05f, 27.2f), "page2");
+        Note("307 床卡", "装卸区钥匙塞在床垫侧面。它只能开走廊尽头的闸门，开不了北围栏。它昨晚从这张床上站起来。让它停在画面中央。", new Vector3(-8.9f, 0.95f, 66.7f));
         Note("卫生间告示", "库房在对面。行政在库房再往西。这里没有钥匙。", new Vector3(9.4f, 1.15f, 8.2f));
     }
 
@@ -343,7 +343,7 @@ public class HospitalSceneBuilder : MonoBehaviour
         Battery(new Vector3(10.4f, 1.18f, 28.6f), 0.45f);
         Battery(new Vector3(-7.8f, 0.95f, 54.55f), 0.5f);
 
-        BasicFirstPersonController player = BuildPlayer();
+        ThirdPersonController player = BuildPlayer();
         MonsterWatcherAI monster = BuildMonster(player, morgue, new int[]
         {
             postWard, j301, j305, j307, jMorgue, morgue, j307, j305
@@ -368,7 +368,7 @@ public class HospitalSceneBuilder : MonoBehaviour
         BuildCampaign();
     }
 
-    BasicFirstPersonController BuildPlayer()
+    ThirdPersonController BuildPlayer()
     {
         GameObject player = new GameObject("Player");
         player.transform.SetParent(level, false);
@@ -383,37 +383,54 @@ public class HospitalSceneBuilder : MonoBehaviour
         controller.minMoveDistance = 0f;
 
         player.AddComponent<PlayerInventory>();
-        BasicFirstPersonController motor = player.AddComponent<BasicFirstPersonController>();
+        ThirdPersonController motor = player.AddComponent<ThirdPersonController>();
         motor.walkSpeed = walkSpeed;
         motor.sprintSpeed = sprintSpeed;
         motor.mouseSensitivity = mouseSensitivity;
+        BuildNurse(motor);
+
+        GameObject pivot = new GameObject("CameraPivot");
+        pivot.transform.SetParent(player.transform, false);
+        pivot.transform.localPosition = new Vector3(0.4f, 1.52f, 0.08f);
+        motor.cameraPivot = pivot.transform;
 
         GameObject cameraObject = new GameObject("PlayerCamera");
-        cameraObject.transform.SetParent(player.transform, false);
-        cameraObject.transform.localPosition = new Vector3(0f, 1.64f, 0f);
+        cameraObject.transform.SetParent(pivot.transform, false);
+        cameraObject.transform.localPosition = new Vector3(0f, 0f, -3.05f);
         cameraObject.tag = "MainCamera";
         Camera camera = cameraObject.AddComponent<Camera>();
-        camera.fieldOfView = 68f;
-        camera.nearClipPlane = 0.05f;
+        camera.fieldOfView = 66f;
+        camera.nearClipPlane = 0.07f;
         camera.farClipPlane = 140f;
         camera.clearFlags = CameraClearFlags.SolidColor;
-        camera.backgroundColor = new Color(0.012f, 0.014f, 0.018f);
+        camera.backgroundColor = new Color(0.01f, 0.016f, 0.015f);
         cameraObject.AddComponent<AudioListener>();
         motor.cameraHolder = cameraObject.transform;
 
+        GameObject rimObject = new GameObject("Rim");
+        rimObject.transform.SetParent(cameraObject.transform, false);
+        rimObject.transform.localPosition = new Vector3(-0.12f, 0.04f, 0.18f);
+        Light rim = rimObject.AddComponent<Light>();
+        rim.type = LightType.Point;
+        rim.range = 3.4f;
+        rim.intensity = 0.42f;
+        rim.color = new Color(0.55f, 0.68f, 0.82f);
+        rim.shadows = LightShadows.None;
+        rim.renderMode = LightRenderMode.ForcePixel;
+
         GameObject flashObject = new GameObject("Flashlight");
-        flashObject.transform.SetParent(cameraObject.transform, false);
-        flashObject.transform.localPosition = new Vector3(0.22f, -0.16f, 0.28f);
+        flashObject.transform.SetParent(player.transform, false);
         Light spot = flashObject.AddComponent<Light>();
         spot.type = LightType.Spot;
-        spot.spotAngle = 52f;
+        spot.spotAngle = 54f;
         spot.range = 18f;
         spot.intensity = 2.6f;
-        spot.color = new Color(1f, 0.94f, 0.82f);
+        spot.color = new Color(1f, 0.88f, 0.68f);
         spot.shadows = LightShadows.Soft;
         spot.renderMode = LightRenderMode.ForcePixel;
         geo.Cylinder(flashObject.transform, "Prop", new Vector3(0f, 0f, 0.05f), 0.035f, 0.22f, Quaternion.Euler(90f, 0f, 0f), mats.metal, false);
         AddDust(flashObject.transform);
+        motor.flashlightMount = flashObject.transform;
 
         FlashlightController flashlight = player.AddComponent<FlashlightController>();
         flashlight.spot = spot;
@@ -426,7 +443,71 @@ public class HospitalSceneBuilder : MonoBehaviour
         return motor;
     }
 
-    MonsterWatcherAI BuildMonster(BasicFirstPersonController player, int spawnNode, int[] patrol)
+    void BuildNurse(ThirdPersonController motor)
+    {
+        Material scrubs = new Material(mats.fabric);
+        scrubs.color = new Color(0.62f, 0.82f, 0.8f);
+        Material liveSkin = new Material(mats.skin);
+        liveSkin.color = new Color(1.08f, 0.84f, 0.74f);
+        Material hair = new Material(mats.paint);
+        hair.color = new Color(0.1f, 0.09f, 0.1f);
+        Material shoe = new Material(mats.metal);
+        shoe.color = new Color(0.12f, 0.12f, 0.13f);
+        Material stripe = new Material(mats.sheet);
+        stripe.color = new Color(0.78f, 0.82f, 0.8f);
+
+        Transform visual = new GameObject("Nurse").transform;
+        visual.SetParent(motor.transform, false);
+
+        Transform hipL = new GameObject("HipL").transform;
+        hipL.SetParent(visual, false);
+        hipL.localPosition = new Vector3(-0.1f, 0.9f, 0f);
+        geo.Capsule(hipL, "PropLeg", new Vector3(0f, -0.44f, 0f), 0.07f, 0.88f, Quaternion.identity, liveSkin, false);
+        geo.Box(hipL, "PropShoe", new Vector3(0f, -0.86f, 0.04f), new Vector3(0.1f, 0.08f, 0.2f), shoe, Vector2.one, false, false);
+
+        Transform hipR = new GameObject("HipR").transform;
+        hipR.SetParent(visual, false);
+        hipR.localPosition = new Vector3(0.1f, 0.9f, 0f);
+        geo.Capsule(hipR, "PropLeg", new Vector3(0f, -0.44f, 0f), 0.07f, 0.88f, Quaternion.identity, liveSkin, false);
+        geo.Box(hipR, "PropShoe", new Vector3(0f, -0.86f, 0.04f), new Vector3(0.1f, 0.08f, 0.2f), shoe, Vector2.one, false, false);
+
+        Transform spine = new GameObject("Spine").transform;
+        spine.SetParent(visual, false);
+        spine.localPosition = new Vector3(0f, 0.96f, 0f);
+        geo.Box(spine, "PropCoat", new Vector3(0f, 0.18f, 0.02f), new Vector3(0.46f, 0.58f, 0.28f), scrubs, Vector2.one, false, false);
+        geo.Box(spine, "PropHem", new Vector3(0f, -0.18f, 0.02f), new Vector3(0.42f, 0.32f, 0.26f), scrubs, Vector2.one, false, false);
+        geo.Box(spine, "PropStripe", new Vector3(0f, 0.22f, -0.12f), new Vector3(0.08f, 0.46f, 0.02f), stripe, Vector2.one, false, false);
+
+        Transform armL = new GameObject("ArmL").transform;
+        armL.SetParent(spine, false);
+        armL.localPosition = new Vector3(-0.28f, 0.36f, 0f);
+        geo.Capsule(armL, "PropArm", new Vector3(0f, -0.3f, 0f), 0.045f, 0.62f, Quaternion.identity, liveSkin, false);
+
+        Transform armR = new GameObject("ArmR").transform;
+        armR.SetParent(spine, false);
+        armR.localPosition = new Vector3(0.28f, 0.36f, 0f);
+        geo.Capsule(armR, "PropArm", new Vector3(0f, -0.3f, 0f), 0.045f, 0.62f, Quaternion.identity, liveSkin, false);
+        Transform hand = new GameObject("Hand").transform;
+        hand.SetParent(armR, false);
+        hand.localPosition = new Vector3(0f, -0.58f, 0.05f);
+
+        Transform head = new GameObject("Head").transform;
+        head.SetParent(spine, false);
+        head.localPosition = new Vector3(0f, 0.56f, 0.02f);
+        geo.Sphere(head, "PropHead", Vector3.zero, 0.125f, liveSkin, false);
+        geo.Sphere(head, "PropHair", new Vector3(0f, 0.045f, -0.02f), 0.138f, hair, false);
+        geo.Sphere(head, "PropBun", new Vector3(0f, -0.02f, -0.11f), 0.07f, hair, false);
+
+        motor.spine = spine;
+        motor.head = head;
+        motor.armL = armL;
+        motor.armR = armR;
+        motor.legL = hipL;
+        motor.legR = hipR;
+        motor.hand = hand;
+    }
+
+    MonsterWatcherAI BuildMonster(ThirdPersonController player, int spawnNode, int[] patrol)
     {
         Vector3 spawn = graph.NodePosition(spawnNode);
         GameObject monster = new GameObject("Monster");
@@ -441,6 +522,7 @@ public class HospitalSceneBuilder : MonoBehaviour
 
         Transform visual = new GameObject("Visual").transform;
         visual.SetParent(monster.transform, false);
+        visual.localScale = new Vector3(1.03f, 1.06f, 1.03f);
         geo.Capsule(visual, "PropLeg", new Vector3(-0.12f, 0.48f, 0f), 0.08f, 0.96f, Quaternion.identity, mats.skin, false);
         geo.Capsule(visual, "PropLeg", new Vector3(0.12f, 0.48f, 0f), 0.08f, 0.96f, Quaternion.identity, mats.skin, false);
         geo.Box(visual, "PropGown", new Vector3(0f, 0.82f, 0.02f), new Vector3(0.58f, 0.85f, 0.32f), mats.gown, Vector2.one, false, false);
@@ -482,6 +564,7 @@ public class HospitalSceneBuilder : MonoBehaviour
         ai.armR = armR;
         ai.head = head;
         ai.eyeMaterial = eyes;
+        ai.eyeLight = glow;
         ai.patrolNodes = patrol;
         ai.patrolSpeed = monsterPatrolSpeed;
         ai.huntSpeed = monsterHuntSpeed;
@@ -933,12 +1016,12 @@ public class HospitalSceneBuilder : MonoBehaviour
     {
         RenderSettings.fog = true;
         RenderSettings.fogMode = FogMode.Exponential;
-        RenderSettings.fogDensity = 0.04f;
-        RenderSettings.fogColor = new Color(0.015f, 0.017f, 0.022f);
+        RenderSettings.fogDensity = 0.036f;
+        RenderSettings.fogColor = new Color(0.012f, 0.02f, 0.018f);
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-        RenderSettings.ambientLight = new Color(0.05f, 0.052f, 0.06f);
-        QualitySettings.pixelLightCount = 8;
-        QualitySettings.shadowDistance = 28f;
+        RenderSettings.ambientLight = new Color(0.036f, 0.042f, 0.048f);
+        QualitySettings.pixelLightCount = 10;
+        QualitySettings.shadowDistance = 36f;
     }
 
     void DisableSceneDefaults()
@@ -1447,7 +1530,7 @@ public class HospitalSceneBuilder : MonoBehaviour
 
         Note("团体治疗", "今晚的团体治疗取消。终端在走廊西头，密码不在这间。", new Vector3(-10.2f, 1.1f, 86.4f));
         Note("废码", "复印件上的 7751 是测试码，终端不收。去看《零号观察》。", new Vector3(-27.2f, 1.1f, 87.2f));
-        Note("交接残页 5", "交接残页 5/5。它过了装卸闸门之后，只有你看着它，走廊才过得去。", new Vector3(-40.6f, 1.1f, 70.8f), "page5");
+        Note("交接残页 5", "交接残页 5/5。它过了装卸闸门之后，只有它停在画面中央，走廊才过得去。", new Vector3(-40.6f, 1.1f, 70.8f), "page5");
         Note("林夏 4", "林夏：我把名字留在安静室的床头。你若读到这里，夜班就不只是我一个人的了。", new Vector3(-19.4f, 1.05f, 70.2f), "linxia4");
         Note("床头刻名", "床头刻着值班人的名字。登记表上，最后一个签字的人已经在这张床上躺过。", new Vector3(-14.2f, 0.95f, 73.4f), "quiet_read");
 
